@@ -803,12 +803,21 @@ function renderHero() {
   document.getElementById("hero-date").textContent = current.as_of_date;
   document.getElementById("hero-confidence").textContent = current.confidence_level;
   document.getElementById("hero-summary").textContent = current.macro_summary;
+  document.getElementById("hero-state").textContent = current.current_macro_state || "—";
+  document.getElementById("hero-domestic").textContent = current.domestic_view || "—";
+  document.getElementById("hero-overseas").textContent = current.overseas_view || "—";
   document.getElementById("hero-validation").innerHTML = current.data_validation
     ? `
       <div class="hero-validation-card">
         <div class="hero-validation-top">
           <span class="hero-validation-kicker">数据校验</span>
-          <span class="hero-validation-status ${current.data_validation.status === "基本一致" ? "is-supportive" : "is-watch"}">${escapeHtml(current.data_validation.status)}</span>
+          <span class="hero-validation-status ${
+            current.data_validation.status === "基本一致"
+              ? "is-supportive"
+              : current.data_validation.status === "明显背离"
+                ? "is-pressured"
+                : "is-watch"
+          }">${escapeHtml(current.data_validation.status)}</span>
         </div>
         <div class="hero-validation-text">${escapeHtml(current.data_validation.summary || "")}</div>
       </div>
@@ -913,33 +922,75 @@ function renderDataDrivenView() {
 function renderOverview() {
   const current = state.data.current_view;
   const pathSteps = current.current_system_path?.steps || [];
-  const cards = [
-    { label: "当前宏观结论", value: current.current_macro_state, note: current.macro_state_note },
-    { label: "国内主线", value: current.domestic_view, note: current.domestic_note },
-    { label: "海外主线", value: current.overseas_view, note: current.overseas_note },
-  ];
-  if (current.data_validation) {
-    cards.push({
-      label: "数据驱动校验",
-      value: current.data_validation.status,
-      note: current.data_validation.summary,
-    });
-  }
-  document.getElementById("macro-summary-cards").innerHTML = cards
-    .map(
-      (card) => `
-        <article class="summary-card">
-          <div class="summary-label">${escapeHtml(card.label)}</div>
-          <div class="summary-value">${escapeHtml(card.value)}</div>
-          <div class="summary-note">${escapeHtml(card.note)}</div>
-        </article>
-      `
-    )
-    .join("");
+  const validationStatusClass = current.data_validation
+    ? current.data_validation.status === "基本一致"
+      ? "is-supportive"
+      : current.data_validation.status === "明显背离"
+        ? "is-pressured"
+        : "is-watch"
+    : "is-neutral";
+  document.getElementById("macro-summary-cards").innerHTML = `
+    <div class="overview-state-grid">
+      <article class="overview-state-card is-hero">
+        <div class="overview-state-eyebrow">Current Regime</div>
+        <h3>${escapeHtml(current.current_macro_state || "—")}</h3>
+        <p class="overview-state-copy">${escapeHtml(current.macro_state_note || current.macro_summary || "")}</p>
+        <div class="overview-state-meta">
+          <div class="overview-state-meta-item">
+            <span>截至日期</span>
+            <strong>${escapeHtml(current.as_of_date || "—")}</strong>
+          </div>
+          <div class="overview-state-meta-item">
+            <span>判断置信度</span>
+            <strong>${escapeHtml(current.confidence_level || "—")}</strong>
+          </div>
+          <div class="overview-state-meta-item">
+            <span>情景标签</span>
+            <strong>${escapeHtml(`${(current.current_regime_labels || []).length || 0} 项主线`)}</strong>
+          </div>
+        </div>
+      </article>
 
-  document.getElementById("framework-pills").innerHTML = `<div class="pill-row">${current.primary_frameworks_used
-    .map((item) => `<span class="pill">${escapeHtml(item)}</span>`)
-    .join("")}</div>`;
+      <article class="overview-state-card">
+        <div class="overview-state-label">国内主线</div>
+        <div class="overview-state-value">${escapeHtml(current.domestic_view || "—")}</div>
+        <div class="overview-state-note">${escapeHtml(current.domestic_note || "")}</div>
+      </article>
+
+      <article class="overview-state-card">
+        <div class="overview-state-label">海外主线</div>
+        <div class="overview-state-value">${escapeHtml(current.overseas_view || "—")}</div>
+        <div class="overview-state-note">${escapeHtml(current.overseas_note || "")}</div>
+      </article>
+
+      ${
+        current.data_validation
+          ? `
+            <article class="overview-state-card is-validation ${validationStatusClass}">
+              <div class="overview-state-topline">
+                <div class="overview-state-label">数据驱动校验</div>
+                <span class="overview-state-badge ${validationStatusClass}">${escapeHtml(current.data_validation.status || "观察")}</span>
+              </div>
+              <div class="overview-state-note">${escapeHtml(current.data_validation.summary || "")}</div>
+            </article>
+          `
+          : ""
+      }
+    </div>
+  `;
+
+  document.getElementById("framework-pills").innerHTML = `
+    <div class="overview-framework-shell">
+      <div class="overview-framework-stat">
+        <span>框架编排</span>
+        <strong>${escapeHtml(`${(current.primary_frameworks_used || []).length} 个核心框架`)}</strong>
+        <p>先识别位置，再验证节奏，最后映射到资产动作。</p>
+      </div>
+      <div class="overview-framework-cloud">
+        ${(current.primary_frameworks_used || []).map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}
+      </div>
+    </div>
+  `;
   const recommendedFrameworks = FRAMEWORK_READING_ORDER
     .map((id) => (state.data.frameworks || []).find((item) => item.id === id))
     .filter(Boolean)

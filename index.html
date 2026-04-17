@@ -31,32 +31,52 @@
 
       <!-- ── SIDEBAR ─────────────────────────────── -->
       <aside class="sidebar">
-        <div class="hero-card">
-          <div class="hero-kicker">Macro Allocation Terminal</div>
-          <h1>宏观经济与大类资产配置研究设计</h1>
-          <p id="hero-summary">用于统一展示宏观框架、历史复盘、当前判断与大类资产配置建议。</p>
-          <div class="hero-meta">
-            <div class="meta-item">
-              <span class="meta-label">截至日期</span>
-              <strong id="hero-date">—</strong>
+        <div class="sidebar-stack">
+          <div class="hero-card">
+            <div class="hero-kicker">Macro Allocation Terminal</div>
+            <h1>宏观经济与大类资产配置研究设计</h1>
+            <p id="hero-summary">用于统一展示宏观框架、历史复盘、当前判断与大类资产配置建议。</p>
+            <div class="hero-brief-grid">
+              <div class="hero-focus-card">
+                <span class="hero-focus-label">当前主判断</span>
+                <strong id="hero-state">—</strong>
+              </div>
+              <div class="hero-mini-stack">
+                <div class="hero-mini-card">
+                  <span>国内主线</span>
+                  <strong id="hero-domestic">—</strong>
+                </div>
+                <div class="hero-mini-card">
+                  <span>海外主线</span>
+                  <strong id="hero-overseas">—</strong>
+                </div>
+              </div>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">判断置信度</span>
-              <strong id="hero-confidence">—</strong>
+            <div class="hero-meta">
+              <div class="meta-item">
+                <span class="meta-label">截至日期</span>
+                <strong id="hero-date">—</strong>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">判断置信度</span>
+                <strong id="hero-confidence">—</strong>
+              </div>
+            </div>
+            <div id="hero-validation"></div>
+            <div class="tag-group" id="hero-regimes"></div>
+          </div>
+
+          <div class="sidebar-insight-grid">
+            <div class="side-card side-card-summary">
+              <div class="side-title">当前判断摘要</div>
+              <div id="current-summary-points"></div>
+            </div>
+
+            <div class="side-card side-card-risk">
+              <div class="side-title">当前主要风险</div>
+              <div id="current-risk-points"></div>
             </div>
           </div>
-          <div id="hero-validation"></div>
-          <div class="tag-group" id="hero-regimes"></div>
-        </div>
-
-        <div class="side-card">
-          <div class="side-title">当前判断摘要</div>
-          <div id="current-summary-points"></div>
-        </div>
-
-        <div class="side-card">
-          <div class="side-title">当前主要风险</div>
-          <div id="current-risk-points"></div>
         </div>
       </aside>
 
