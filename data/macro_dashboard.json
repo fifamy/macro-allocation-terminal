@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-17 10:17:07",
+  "generated_at": "2026-04-17 11:02:13",
   "generator": {
     "script": "scripts/build_macro_dashboard_data.py",
     "catalog_file": "macro_indicator_list.xlsx",

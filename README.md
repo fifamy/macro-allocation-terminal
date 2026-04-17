@@ -85,7 +85,8 @@ macro-allocation-terminal/
 │   └── manual_macro_series_overrides.json # 在线补齐与手工覆盖结果
 ├── 外部研究报告/                       # 本地补充研究报告
 ├── 一键更新宏观配置数据.command
-└── 一键打开宏观配置终端.command
+├── 一键打开宏观配置终端.command
+└── 一键部署到GitHub.command
 ```
 
 ## 4. 关键数据文件说明
@@ -381,6 +382,35 @@ python3 scripts/build_macro_terminal_bundle.py
 ```
 
 然后再打开 `index.html`，或通过本地静态服务打开。
+
+### 方法四：一键部署到 GitHub
+
+直接双击：
+
+- [一键部署到GitHub.command](./一键部署到GitHub.command)
+
+这个脚本会自动做 4 件事：
+
+- 重建一次前端 bundle，避免页面和数据包不同步
+- `git fetch origin main`，先确认 GitHub 上没有比本地更新的提交
+- 自动 `git add -A`、生成一条时间戳提交
+- 推送到 `https://github.com/fifamy/macro-allocation-terminal`
+
+脚本是保守模式：
+
+- 如果远端比本地更新，会直接停止，不会强推覆盖
+- 如果本地没有任何新改动，会直接提示无需部署
+- 如果你已经本地提交过但还没推送，它会直接把这些提交推上去
+
+部署成功后，公开访问地址是：
+
+- `https://fifamy.github.io/macro-allocation-terminal/`
+
+如果你改的是原始 Excel、PDF 或外部报告抽取链路，建议先双击：
+
+- [一键更新宏观配置数据.command](./一键更新宏观配置数据.command)
+
+等数据重建完成后，再执行部署。
 
 ## 8. 推荐维护顺序
 
