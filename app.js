@@ -416,10 +416,18 @@ function renderOverviewCockpit() {
   root.innerHTML = `
     <div class="overview-cockpit-layout">
       <article class="overview-cockpit-hero">
-        <div class="overview-cluster-gauge-card">
-          <div class="overview-cluster-caption">宏观温度</div>
-          ${buildCockpitGauge(overallScore, overallTone, cockpitLabelFromTone(overallTone))}
-          <div class="overview-cluster-foot">5 个模型综合后的当前温度。</div>
+        <div class="overview-cockpit-gauge-column">
+          <div class="overview-cluster-gauge-card">
+            <div class="overview-cluster-caption">宏观温度</div>
+            ${buildCockpitGauge(overallScore, overallTone, cockpitLabelFromTone(overallTone))}
+            <div class="overview-cluster-foot">5 个模型综合后的当前温度。</div>
+          </div>
+
+          <div class="overview-cluster-gauge-card is-secondary">
+            <div class="overview-cluster-caption">数据一致性</div>
+            ${buildCockpitGauge(validationMeta.score, validationMeta.tone, validationMeta.label)}
+            <div class="overview-cluster-foot">${escapeHtml(current.data_validation?.summary || "等待数据校验结果。")}</div>
+          </div>
         </div>
 
         <div class="overview-cockpit-copy">
@@ -494,12 +502,6 @@ function renderOverviewCockpit() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="overview-cluster-gauge-card is-secondary">
-          <div class="overview-cluster-caption">数据一致性</div>
-          ${buildCockpitGauge(validationMeta.score, validationMeta.tone, validationMeta.label)}
-          <div class="overview-cluster-foot">${escapeHtml(current.data_validation?.summary || "等待数据校验结果。")}</div>
         </div>
       </article>
 

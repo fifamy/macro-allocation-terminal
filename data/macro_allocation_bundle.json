@@ -1,6 +1,6 @@
 {
   "config": {
-    "project_name": "宏观经济与大类资产配置研究设计",
+    "project_name": "宏观经济与大类资产配置研究",
     "audience": "内部投研/FOF团队",
     "tabs": [
       {
@@ -9869,7 +9869,7 @@
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-17 11:21:04",
+    "generated_at": "2026-04-17 11:28:20",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",
