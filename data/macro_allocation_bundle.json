@@ -9869,7 +9869,7 @@
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-17 11:12:19",
+    "generated_at": "2026-04-17 11:21:04",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",
