@@ -52,6 +52,7 @@
   --r-lg: 12px;
   --r-md:  9px;
   --r-sm:  6px;
+  --topbar-offset: 60px;
 }
 
 * { box-sizing: border-box; }
@@ -64,12 +65,15 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  padding-top: var(--topbar-offset);
 }
 
 /* ── TOPBAR ─────────────────────────────────────────── */
 .topbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   flex-wrap: nowrap;
@@ -232,7 +236,7 @@ body {
   display: grid;
   grid-template-columns: 296px minmax(0,1fr);
   gap: 0;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - var(--topbar-offset));
   width: 100%;
   max-width: 1680px;
   margin: 0 auto;
@@ -248,8 +252,8 @@ body {
   padding: 20px 16px;
   min-width: 0;
   position: sticky;
-  top: 60px;
-  height: calc(100vh - 60px);
+  top: var(--topbar-offset);
+  height: calc(100vh - var(--topbar-offset));
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-mid) transparent;

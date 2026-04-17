@@ -10048,7 +10048,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-17 15:51:27",
+    "generated_at": "2026-04-17 16:03:41",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",

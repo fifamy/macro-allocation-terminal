@@ -735,6 +735,22 @@ function renderReportReviewFilter() {
     .join("");
 }
 
+function syncTopbarOffset() {
+  const topbar = document.querySelector(".topbar");
+  if (!topbar) return;
+  const height = Math.ceil(topbar.getBoundingClientRect().height || 60);
+  document.documentElement.style.setProperty("--topbar-offset", `${height}px`);
+}
+
+function initTopbarOffsetObserver() {
+  syncTopbarOffset();
+  window.addEventListener("resize", syncTopbarOffset);
+  const topbar = document.querySelector(".topbar");
+  if (!topbar || typeof ResizeObserver === "undefined") return;
+  const observer = new ResizeObserver(() => syncTopbarOffset());
+  observer.observe(topbar);
+}
+
 function rerenderReportViews() {
   renderOverview();
   renderFrameworks();
@@ -879,6 +895,7 @@ function initTabs() {
   tabButtons.forEach((button, index) => {
     button.addEventListener("click", () => {
       setActiveTab(button.dataset.tab);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
     button.addEventListener("keydown", (event) => {
       const { key } = event;
@@ -891,6 +908,7 @@ function initTabs() {
       if (key === "End") nextIndex = tabButtons.length - 1;
       const nextTab = tabButtons[nextIndex];
       setActiveTab(nextTab.dataset.tab, { focusTab: true });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
 }
@@ -2557,6 +2575,7 @@ async function init() {
   state.data = await getBundle();
   state.activeScenarioId = state.data.current_view?.current_system_path?.linked_scenario_id || state.activeScenarioId;
   initTabs();
+  initTopbarOffsetObserver();
   setActiveTab(state.activeTab, { preserveAssetFocus: true });
   document.addEventListener("click", (event) => {
     const target = event.target.closest("[data-report-review-mode]");
