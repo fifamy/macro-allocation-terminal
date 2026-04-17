@@ -22,6 +22,101 @@ const FRAMEWORK_READING_ORDER = [
   "black-litterman",
 ];
 
+const CHINA_MACRO_ALLOCATION_MODULE = {
+  asOf: "2026年4月17日",
+  title: "中国宏观配置工作流建议",
+  summary:
+    "当前更接近“弱复苏向早期扩张过渡”，配置上偏向金融高股息、制造升级和政策受益成长，不建议押注纯顺周期全面反转。",
+  facts:
+    "LPR维持低位，3月制造业PMI回到50上方，CPI温和回升、PPI由负转正，M2和社融仍高于名义增长，但消费、民间投资和地产链修复偏弱。",
+  judgment:
+    "更适合配“有政策、有盈利、有估值保护”的行业，少碰“只靠总量刺激才成立”的板块。",
+  evidence: [
+    { label: "LPR", value: "1Y 3.0%，5Y 3.5%", note: "2026-03-20 持平，货币环境偏宽松但不是继续猛放水。" },
+    { label: "PMI", value: "制造业 50.4，非制造业 50.1", note: "2026年3月回到扩张区，景气边际改善。" },
+    { label: "CPI / PPI", value: "1.0% / 0.5%", note: "通缩压力缓和，工业价格链条改善。" },
+    { label: "M2 / 社融", value: "8.5% / 存量同比 7.9%", note: "流动性仍偏充裕，但不是大水漫灌。" },
+    { label: "增长", value: "一季度GDP 5.0%", note: "工业偏强，消费和民间投资恢复相对滞后。" },
+  ],
+  phases: [
+    {
+      name: "基准情景",
+      probability: "约60%",
+      note: "弱复苏向早期扩张过渡。信用仍宽，制造业回暖，PPI转正，高技术制造和基建支撑增长。",
+    },
+    {
+      name: "备选情景",
+      probability: "约30%",
+      note: "如果消费、地产、民间投资继续拖累，修复会重新回到“生产强、需求弱”的短脉冲。",
+    },
+  ],
+  phaseSwitches: [
+    "PMI连续2个月低于50。",
+    "PPI再次转负。",
+    "社会消费品零售总额持续低于2%附近。",
+    "民间投资继续恶化。",
+  ],
+  sectors: {
+    overweight: [
+      "银行：低估值、高股息、信用环境不差，兼顾进攻和防守。",
+      "券商/保险：如果风险偏好继续修复，最受益于“弱复苏+资本市场活跃”。",
+      "电子/半导体：高技术制造业景气更强，政策支持明确。",
+      "机械设备/电网设备：制造业升级、设备更新和基建共振。",
+      "通信/算力链：政策主题和资本开支方向仍在。",
+      "有色金属/黄金：PPI转正、全球商品偏强，同时保留对冲属性。",
+    ],
+    neutral: [
+      "食品饮料：需求恢复偏慢，但龙头有防御性。",
+      "医药生物：防御属性仍在，但缺总量弹性。",
+      "家电/汽车：有政策支持，更像结构性机会。",
+      "公用事业/煤炭/石油石化：防守价值在，但当前不是最强主线。",
+    ],
+    underweight: [
+      "房地产：低利率尚未换来基本面确认，暂不逆势重配。",
+      "建筑材料：地产链拖累大于基建拉动。",
+      "商贸零售/社会服务/美容护理：居民消费恢复仍弱。",
+      "农林牧渔：当前通胀主线不在这里。",
+    ],
+  },
+  portfolio: {
+    summary: "默认按30万元、稳健风格、5年期限落地，核心用宽基、债券和现金控波动，卫星用行业表达当前宏观判断。",
+    structure: [
+      { label: "A股核心宽基/红利", weight: "15%", amount: "4.5万" },
+      { label: "A股中盘/制造宽基", weight: "10%", amount: "3.0万" },
+      { label: "港股通红利/科技", weight: "5%", amount: "1.5万" },
+      { label: "银行", weight: "5%", amount: "1.5万" },
+      { label: "电子/半导体", weight: "5%", amount: "1.5万" },
+      { label: "机械设备/高端制造", weight: "4%", amount: "1.2万" },
+      { label: "券商/保险", weight: "3%", amount: "0.9万" },
+      { label: "有色/黄金股", weight: "3%", amount: "0.9万" },
+      { label: "国债/政金债", weight: "18%", amount: "5.4万" },
+      { label: "中高等级信用债", weight: "8%", amount: "2.4万" },
+      { label: "可转债", weight: "6%", amount: "1.8万" },
+      { label: "黄金", weight: "5%", amount: "1.5万" },
+      { label: "公募REITs", weight: "3%", amount: "0.9万" },
+      { label: "现金/货基", weight: "10%", amount: "3.0万" },
+    ],
+    rules: [
+      "单只个股上限5%，单只ETF上限20%，单一行业不超过权益仓位的25%。",
+      "再平衡采用“季度检查 + 偏离5%触发”。",
+      "如果PMI连续2个月跌回50以下，先减券商、电子、机械，加债和现金。",
+    ],
+  },
+  risks: [
+    "最大风险不是通胀，而是内需修复不持续。",
+    "如果地产继续弱、民间投资继续负增长，这轮修复更像上游和制造的局部行情，而非全面牛市。",
+    "如果PPI重新转负，需要下调有色和制造权重。",
+    "如果政策再加码且消费修复更快，当前组合会略偏保守。",
+  ],
+  tracking: [
+    "2026年4月和5月PMI。",
+    "2026年4月社融、M2和新增人民币贷款。",
+    "核心CPI能否继续维持在1%上方。",
+    "PPI能否继续保持正值。",
+    "社零、民间投资、房地产销售和新开工是否真正改善。",
+  ],
+};
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -921,6 +1016,164 @@ function renderDataDrivenView() {
   });
 }
 
+function renderChinaMacroAllocationModule() {
+  const root = document.getElementById("china-macro-allocation-module");
+  if (!root) return;
+  const module = CHINA_MACRO_ALLOCATION_MODULE;
+  root.innerHTML = `
+    <section class="section-head china-macro-allocation-head">
+      <div>
+        <h2>${escapeHtml(module.title)}</h2>
+        <p>把最新中国宏观判断、行业轮动和组合建议压缩成一个独立研究模块，便于首页直接查看。</p>
+      </div>
+      <div class="china-macro-allocation-asof">截至 ${escapeHtml(module.asOf)}</div>
+    </section>
+
+    <section class="china-macro-allocation-hero">
+      <div class="china-macro-allocation-kicker">China Macro Allocation</div>
+      <h3>${escapeHtml(module.summary)}</h3>
+      <div class="china-macro-allocation-copy-grid">
+        <article class="china-macro-copy-card">
+          <span>数据事实</span>
+          <p>${escapeHtml(module.facts)}</p>
+        </article>
+        <article class="china-macro-copy-card">
+          <span>配置判断</span>
+          <p>${escapeHtml(module.judgment)}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="china-macro-allocation-section">
+      <div class="china-macro-section-head">
+        <h3>核心证据</h3>
+        <p>把关键月度和季度指标压缩成可直接讨论的配置锚点。</p>
+      </div>
+      <div class="china-macro-evidence-grid">
+        ${module.evidence
+          .map(
+            (item) => `
+              <article class="china-macro-evidence-card">
+                <div class="china-macro-evidence-top">
+                  <span class="china-macro-evidence-label">${escapeHtml(item.label)}</span>
+                  <strong>${escapeHtml(item.value)}</strong>
+                </div>
+                <p>${escapeHtml(item.note)}</p>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="china-macro-allocation-section">
+      <div class="china-macro-section-head">
+        <h3>周期阶段</h3>
+        <p>当前以基准情景为主，同时保留切换条件。</p>
+      </div>
+      <div class="china-macro-phase-grid">
+        ${module.phases
+          .map(
+            (item) => `
+              <article class="china-macro-phase-card">
+                <div class="china-macro-phase-top">
+                  <span>${escapeHtml(item.name)}</span>
+                  <strong>${escapeHtml(item.probability)}</strong>
+                </div>
+                <p>${escapeHtml(item.note)}</p>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="china-macro-trigger-card">
+        <div class="china-macro-trigger-title">情景切换指标</div>
+        <ul class="bullet-list">
+          ${module.phaseSwitches.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </div>
+    </section>
+
+    <section class="china-macro-allocation-section">
+      <div class="china-macro-section-head">
+        <h3>行业轮动结论</h3>
+        <p>按超配、标配、低配三层结构展示，不改动站内原有资产模块。</p>
+      </div>
+      <div class="china-macro-sector-grid">
+        <article class="china-macro-sector-card is-overweight">
+          <div class="china-macro-sector-title">超配</div>
+          <ul class="bullet-list">
+            ${module.sectors.overweight.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        </article>
+        <article class="china-macro-sector-card is-neutral">
+          <div class="china-macro-sector-title">标配</div>
+          <ul class="bullet-list">
+            ${module.sectors.neutral.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        </article>
+        <article class="china-macro-sector-card is-underweight">
+          <div class="china-macro-sector-title">低配</div>
+          <ul class="bullet-list">
+            ${module.sectors.underweight.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="china-macro-allocation-section">
+      <div class="china-macro-section-head">
+        <h3>组合配置建议</h3>
+        <p>${escapeHtml(module.portfolio.summary)}</p>
+      </div>
+      <div class="china-macro-portfolio-grid">
+        ${module.portfolio.structure
+          .map(
+            (item) => `
+              <article class="china-macro-portfolio-card">
+                <div class="china-macro-portfolio-weight">${escapeHtml(item.weight)}</div>
+                <div class="china-macro-portfolio-name">${escapeHtml(item.label)}</div>
+                <div class="china-macro-portfolio-amount">${escapeHtml(item.amount)}</div>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="china-macro-rule-card">
+        <div class="china-macro-trigger-title">执行规则</div>
+        <ul class="bullet-list">
+          ${module.portfolio.rules.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </div>
+    </section>
+
+    <section class="china-macro-allocation-section china-macro-allocation-tail">
+      <article class="china-macro-tail-card">
+        <div class="china-macro-section-head compact">
+          <div>
+            <h3>风险与失效条件</h3>
+            <p>这部分决定组合什么时候该收缩，而不是继续硬扛。</p>
+          </div>
+        </div>
+        <ul class="bullet-list">
+          ${module.risks.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </article>
+      <article class="china-macro-tail-card">
+        <div class="china-macro-section-head compact">
+          <div>
+            <h3>下一步跟踪数据</h3>
+            <p>后续最关键的是确认这轮修复能否从生产端扩散到需求端。</p>
+          </div>
+        </div>
+        <ul class="bullet-list">
+          ${module.tracking.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </article>
+    </section>
+  `;
+}
+
 function renderOverview() {
   const current = state.data.current_view;
   const pathSteps = current.current_system_path?.steps || [];
@@ -1136,6 +1389,7 @@ function renderOverview() {
     });
   });
 
+  renderChinaMacroAllocationModule();
   document.getElementById("driver-list").innerHTML = current.key_drivers.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   document.getElementById("notes-list").innerHTML = current.notes.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   renderOverviewCockpit();

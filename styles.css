@@ -1832,6 +1832,228 @@ body {
   line-height: 1.6;
 }
 
+/* ── CHINA MACRO ALLOCATION MODULE ─────────────────── */
+.china-macro-allocation-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.china-macro-allocation-asof {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(26,51,88,0.06);
+  border: 1px solid rgba(26,51,88,0.12);
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.china-macro-allocation-hero {
+  padding: 18px 20px;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(26,51,88,0.10);
+  background: linear-gradient(145deg, rgba(26,51,88,0.05) 0%, rgba(15,125,110,0.05) 100%);
+}
+
+.china-macro-allocation-kicker {
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.china-macro-allocation-hero h3 {
+  margin: 8px 0 0;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.china-macro-allocation-copy-grid,
+.china-macro-phase-grid,
+.china-macro-allocation-tail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.china-macro-allocation-copy-grid {
+  margin-top: 16px;
+}
+
+.china-macro-copy-card,
+.china-macro-phase-card,
+.china-macro-trigger-card,
+.china-macro-rule-card,
+.china-macro-tail-card {
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.china-macro-copy-card span,
+.china-macro-trigger-title {
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.china-macro-copy-card p,
+.china-macro-phase-card p {
+  margin: 8px 0 0;
+  color: var(--ink-dim);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.china-macro-allocation-section {
+  margin-top: 18px;
+}
+
+.china-macro-section-head {
+  margin-bottom: 12px;
+}
+
+.china-macro-section-head h3 {
+  margin: 0 0 4px;
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.china-macro-section-head p {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.china-macro-evidence-grid,
+.china-macro-sector-grid,
+.china-macro-portfolio-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.china-macro-evidence-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.china-macro-sector-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.china-macro-portfolio-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.china-macro-evidence-card,
+.china-macro-sector-card,
+.china-macro-portfolio-card {
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.china-macro-evidence-top,
+.china-macro-phase-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.china-macro-evidence-label,
+.china-macro-phase-top span,
+.china-macro-sector-title {
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.china-macro-evidence-top strong,
+.china-macro-phase-top strong {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.china-macro-evidence-card p {
+  margin: 8px 0 0;
+  color: var(--ink-dim);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.china-macro-trigger-card,
+.china-macro-rule-card {
+  margin-top: 12px;
+  background: var(--surface-2);
+}
+
+.china-macro-sector-card.is-overweight {
+  border-color: rgba(185,28,28,0.14);
+  background: rgba(185,28,28,0.03);
+}
+
+.china-macro-sector-card.is-neutral {
+  border-color: rgba(26,51,88,0.10);
+  background: rgba(26,51,88,0.03);
+}
+
+.china-macro-sector-card.is-underweight {
+  border-color: rgba(15,125,110,0.14);
+  background: rgba(15,125,110,0.04);
+}
+
+.china-macro-portfolio-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.china-macro-portfolio-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--navy) 0%, var(--gold) 100%);
+}
+
+.china-macro-portfolio-weight {
+  color: var(--navy);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.china-macro-portfolio-name {
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.china-macro-portfolio-amount {
+  margin-top: 6px;
+  color: var(--ink-dim);
+  font-size: 11px;
+}
+
 /* ── BULLET LISTS ───────────────────────────────────── */
 .bullet-list {
   margin: 0;
@@ -3808,7 +4030,11 @@ body {
   .overview-cockpit-gauge-column { grid-template-rows: none; }
   .sidebar-insight-grid,
   .hero-brief-grid,
-  .overview-state-grid { grid-template-columns: 1fr; }
+  .overview-state-grid,
+  .china-macro-sector-grid,
+  .china-macro-allocation-copy-grid,
+  .china-macro-phase-grid,
+  .china-macro-allocation-tail { grid-template-columns: 1fr; }
   .overview-state-card.is-hero,
   .overview-state-card.is-validation { grid-column: auto; }
 }
@@ -3878,7 +4104,13 @@ body {
   .macro-missing-grid,
   .macro-highlight-list,
   .indicator-groups,
-  .index-intro-grid { grid-template-columns: 1fr; }
+  .index-intro-grid,
+  .china-macro-evidence-grid,
+  .china-macro-sector-grid,
+  .china-macro-portfolio-grid,
+  .china-macro-allocation-copy-grid,
+  .china-macro-phase-grid,
+  .china-macro-allocation-tail { grid-template-columns: 1fr; }
   .data-driven-hero { grid-template-columns: 1fr; }
   .macro-signal-grid { grid-template-columns: 1fr; }
   .hero-meta,
@@ -3914,6 +4146,9 @@ body {
   .overview-cockpit-copy { padding: 16px; }
   .framework-reading-sep { display: none; }
   .overview-state-topline { flex-direction: column; align-items: flex-start; }
+  .china-macro-allocation-head,
+  .china-macro-evidence-top,
+  .china-macro-phase-top { flex-direction: column; align-items: flex-start; }
   .hero-focus-card strong,
   .overview-state-card.is-hero h3,
   .overview-framework-stat strong { font-size: 22px; }
