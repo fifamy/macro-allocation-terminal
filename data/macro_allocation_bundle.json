@@ -2933,7 +2933,7 @@
       "source_links": [
         {
           "label": "资产配置 vs 风险配置：宏观风险配置框架",
-          "url": "data/framework-sources/asset-vs-risk-allocation-framework.html"
+          "url": "data/framework-sources/asset-vs-risk-allocation-framework.html?v=20260417-static"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2024年8月）",
@@ -3025,7 +3025,7 @@
         },
         {
           "label": "宏观因子投资体系下的风险动态配置系统",
-          "url": "data/framework-sources/macro-factor-dynamic-risk-system.html"
+          "url": "data/framework-sources/macro-factor-dynamic-risk-system.html?v=20260417-static"
         }
       ],
       "tags": [
@@ -10048,7 +10048,7 @@
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-17 15:39:25",
+    "generated_at": "2026-04-17 15:51:27",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",

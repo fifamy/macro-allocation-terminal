@@ -1,721 +1,177 @@
 <!doctype html>
-<html lang="zh-CN" id="htmlRoot">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="renderer" content="webkit" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0"
-    />
-    <title> BigQuant AI量化平台 </title>
-    <meta
-      name="description"
-      content="BigQuant AI量化策略广场提供大量专业量化交易策略源码，涵盖股票、期货、ETF等多品种。学习AI量化投资方法，获取基于机器学习的多因子选股、趋势跟踪、事件驱动等策略模板，支持一键回测与模拟交易。"
-    />
-    <meta
-      name="keywords"
-      content="AI量化策略,股票量化模板,期货交易策略,ETF轮动策略,多因子选股,机器学习投资,量化回测平台,BigQuant策略代码"
-    />
-    <!-- <link rel="icon" href="/favicon.ico" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>资产配置 vs 风险配置：宏观风险配置框架</title>
     <style>
+      :root {
+        --bg: #f4f1ea;
+        --surface: #fffdf8;
+        --ink: #1d2733;
+        --ink-dim: #546171;
+        --line: #d9d1c3;
+        --navy: #1a3358;
+        --gold: #b5832a;
+      }
+
+      * { box-sizing: border-box; }
+
       body {
         margin: 0;
-        padding: 0;
+        font-family: "PingFang SC", "Noto Serif SC", "Source Han Serif SC", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top right, rgba(181, 131, 42, 0.12), transparent 28%),
+          linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+      }
+
+      main {
+        width: min(880px, calc(100vw - 32px));
+        margin: 32px auto 56px;
+      }
+
+      .hero,
+      .card {
+        background: rgba(255, 253, 248, 0.94);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(26, 51, 88, 0.08);
+      }
+
+      .hero {
+        padding: 28px 30px;
+      }
+
+      .eyebrow {
+        color: var(--gold);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 10px 0 12px;
+        color: var(--navy);
+        font-size: clamp(28px, 4vw, 42px);
+        line-height: 1.15;
+      }
+
+      .hero p,
+      .card p,
+      li {
+        margin: 0;
+        color: var(--ink-dim);
+        font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .hero p + p {
+        margin-top: 10px;
+      }
+
+      .meta {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .pill {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(26, 51, 88, 0.12);
+        background: rgba(26, 51, 88, 0.04);
+        color: var(--navy);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .grid {
+        margin-top: 18px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .card {
+        padding: 24px 26px;
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        color: var(--navy);
+        font-size: 22px;
+      }
+
+      ul {
+        margin: 12px 0 0;
+        padding-left: 20px;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .note {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        border: 1px dashed rgba(181, 131, 42, 0.45);
+        background: rgba(181, 131, 42, 0.08);
+      }
+
+      .note strong {
+        color: var(--navy);
       }
     </style>
   </head>
-
   <body>
-    <script>
-      (() => {
-        var htmlRoot = document.getElementById('htmlRoot');
-        var theme = window.localStorage.getItem('__APP__DARK__MODE__');
-        if (htmlRoot && theme) {
-          htmlRoot.setAttribute('data-theme', theme);
-          theme = htmlRoot = null;
-        }
-      })();
-    </script>
-    <div id="app">
-      <style>
-        #app {
-          overflow: hidden;
-        }
-
-        .index {
-          position: fixed;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          width: 100%;
-          height: 100100%;
-          background-image: linear-gradient(270deg, #d24429, #7d2002);
-          display: flex;
-          justify-content: space-between;
-        }
-
-        a {
-          text-decoration: none;
-        }
-
-        .preload-c-header {
-          --text-color: #fff;
-          --bg-color: transparent;
-          --b-border-color: rgba(255, 255, 255, 0.3);
-          --header-shadow: unset;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          height: 56px;
-          background-color: var(--bg-color);
-          font-size: 14px;
-          color: var(--text-color);
-          box-shadow: var(--header-shadow);
-          z-index: 501;
-        }
-
-        .preload-c-header a {
-          color: unset;
-        }
-
-        .preload-c-header-wrapper {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          padding: 0 22px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .preload-c-header-left {
-          display: flex;
-          height: 100%;
-          align-items: center;
-        }
-
-        .preload-c-header-b {
-          margin-left: 11px;
-          display: inline-block;
-          padding: 0 12px 0 11px;
-          height: 28px;
-          line-height: 28px;
-          border-radius: 16px;
-          font-size: 12px;
-          cursor: pointer;
-          border-radius: 16px;
-          border: 1px solid var(--b-border-color);
-          color: var(--text-color);
-        }
-
-        .preload-c-header-b > span {
-          display: block;
-        }
-
-        .preload-c-header-center {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          height: 100%;
-        }
-
-        .preload-c-header-nav {
-          height: 100%;
-        }
-
-        .preload-c-header-nav-ul {
-          margin: 0;
-          padding: 0;
-          display: flex;
-          justify-content: space-between;
-          height: calc(56px + 8px);
-          transform: translateY(-4px);
-        }
-
-        .preload-c-header-nav-li {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          /* width: 100px; */
-          cursor: pointer;
-          opacity: 0.9;
-        }
-
-        .preload-c-header-nav-li:hover {
-          opacity: 1;
-        }
-
-        .preload-c-header-nav-li-span {
-          display: flex;
-          align-items: center;
-        }
-
-        .preload-c-header-nav-li-span .preload-kb-icon {
-          margin-left: 2px;
-        }
-
-        .preload-kb-menu-arrow {
-          transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
-        }
-
-        .preload-c-header-nav-li:hover .preload-kb-menu-arrow {
-          transform: rotate(-180deg);
-        }
-
-        .preload-c-header-nav-li-span:hover > a {
-          font-weight: bold;
-        }
-
-        @keyframes showMenu {
-          0% {
-            opacity: 0;
-            transform: translateY(25px);
-          }
-
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .preload-c-header-right {
-          display: flex;
-        }
-
-        .preload-bq-header-btn {
-          min-width: 90px;
-          height: 36px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          cursor: pointer;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          border-radius: 18px;
-          background-color: transparent;
-          transition: all 0.3s;
-          font-size: 14px;
-          color: #fff;
-        }
-
-        .preload-bq-header-btn.preload-bq-header-btn-primary {
-          background-color: #fff;
-          border-color: #fff;
-          color: #e74c3c;
-        }
-
-        .preload-bq-header-btn + .preload-bq-header-btn {
-          margin-left: 12px;
-        }
-
-        .preload-bq-header-btn:hover {
-          border-color: #fff;
-          background-color: #fff;
-          color: #e74c3c;
-        }
-
-        .preload-bq-header-btn.preload-bq-header-btn-primary:hover {
-          background-color: rgba(255, 255, 255, 0.85);
-        }
-
-        .preload-header-logo {
-          display: flex;
-          align-items: center;
-        }
-
-        .preload-header-logo__svg .preload-header-logo__bg {
-          fill: #fff;
-          transition: all 0.3s;
-        }
-
-        .preload-header-logo__svg .preload-header-logo__text {
-          fill: #e74c3c;
-          transition: all 0.3s;
-        }
-
-        .preload-header-logo__title {
-          width: 100px;
-          height: 32px;
-          margin-left: 8px;
-        }
-
-        .preload-header-logo__title path {
-          fill: #fff;
-          transition: all 0.3s;
-        }
-
-        .preload-kb-icon {
-          width: 1em;
-          height: 1em;
-          vertical-align: -0.15em;
-          fill: currentColor;
-          overflow: hidden;
-        }
-
-        @media screen and (min-width: 1100px) {
-          .preload-c-header-center {
-            width: 550px;
-          }
-        }
-
-        @media screen and (min-width: 1200px) {
-          .preload-c-header-center {
-            width: 594px;
-          }
-        }
-
-        @media screen and (min-width: 1250px) {
-          .preload-c-header-center {
-            width: 600px;
-          }
-        }
-
-        @media screen and (min-width: 1300px) {
-          .preload-c-header-center {
-            width: 650px;
-          }
-        }
-
-        @media screen and (min-width: 1400px) {
-          .preload-c-header-wrapper {
-            width: 1356px;
-          }
-
-          .preload-c-header-center {
-            width: 750px;
-          }
-        }
-
-        .preload-menu {
-          display: none;
-          font-size: 24px;
-        }
-
-        @media screen and (max-width: 1150px) {
-          .preload-c-header-center,
-          .preload-bq-header-btn {
-            display: none;
-          }
-
-          .preload-c-header-wrapper {
-            padding: 0 20px;
-          }
-
-          .preload-menu {
-            display: block;
-          }
-        }
-      </style>
-      <div class="page">
-        <div class="index">
-          <header data-v-879fd396="" class="preload-c-header">
-            <div class="preload-c-header-wrapper">
-              <div class="preload-c-header-left"
-                ><a data-v-016b11b2="" class="preload-header-logo" href="/" target="_blank"
-                  ><svg
-                    data-v-016b11b2=""
-                    class="preload-header-logo__svg"
-                    width="36px"
-                    height="37px"
-                    viewBox="0 0 36 37"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                  >
-                    <title data-v-016b11b2="">logo</title>
-                    <g
-                      data-v-016b11b2=""
-                      id="导航栏"
-                      stroke="none"
-                      stroke-width="1"
-                      fill="none"
-                      fill-rule="evenodd"
-                    >
-                      <g
-                        data-v-016b11b2=""
-                        id="移动-深色背景下滑后改变为默认白色导航"
-                        transform="translate(-21, -176)"
-                      >
-                        <g data-v-016b11b2="" id="深色背景备份" transform="translate(0, 129.5)">
-                          <g data-v-016b11b2="" id="logo" transform="translate(21, 47)">
-                            <path
-                              data-v-016b11b2=""
-                              d="M12.819426,-3.45280103e-16 L23.180574,5.17920154e-16 C27.6381677,-3.00926524e-16 29.2545989,0.464128056 30.8842285,1.33566352 C32.5138581,2.20719898 33.792801,3.48614185 34.6643365,5.11577148 C35.5358719,6.74540111 36,8.3618323 36,12.819426 L36,23.180574 C36,27.6381677 35.5358719,29.2545989 34.6643365,30.8842285 C33.792801,32.5138581 32.5138581,33.792801 30.8842285,34.6643365 C29.2545989,35.5358719 27.6381677,36 23.180574,36 L12.819426,36 C8.3618323,36 6.74540111,35.5358719 5.11577148,34.6643365 C3.48614185,33.792801 2.20719898,32.5138581 1.33566352,30.8842285 C0.464128056,29.2545989 1.00308841e-16,27.6381677 -1.72640051e-16,23.180574 L3.45280103e-16,12.819426 C-2.00617683e-16,8.3618323 0.464128056,6.74540111 1.33566352,5.11577148 C2.20719898,3.48614185 3.48614185,2.20719898 5.11577148,1.33566352 C6.74540111,0.464128056 8.3618323,2.00617683e-16 12.819426,-3.45280103e-16 Z"
-                              id="bg"
-                              class="preload-header-logo__bg"
-                              fill="#E74C3C"
-                            ></path>
-                            <g
-                              data-v-016b11b2=""
-                              id="Q"
-                              transform="translate(8.5714, 7.7143)"
-                              fill="#FFFFFF"
-                              class="preload-header-logo__text"
-                            >
-                              <path
-                                data-v-016b11b2=""
-                                d="M8.85587715,1.77635684e-15 C13.746843,1.77635684e-15 17.7117543,4.3343536 17.7117543,9.68104972 C17.7117543,13.5928799 15.5893777,16.9628134 12.5347525,18.4898286 C14.0859719,19.7951224 15.8153235,20.490945 17.7224617,20.5778826 C18.6808806,20.5778826 18.1866479,21.4965794 17.5325076,21.4965794 L17.1242864,21.4965794 C14.6631711,21.4461068 12.2851685,20.7086934 9.99027854,19.2843392 C9.61930794,19.3353013 9.24045532,19.3620994 8.85587715,19.3620994 C3.96491125,19.3620994 0,15.0277458 0,9.68104972 C0,4.3343536 3.96491125,1.77635684e-15 8.85587715,1.77635684e-15 Z M8.85587715,0.841830411 C6.75974891,0.841830411 5.06050123,4.7992837 5.06050123,9.68104972 C5.06050123,14.5628158 6.75974891,18.520269 8.85587715,18.520269 C10.9520054,18.520269 12.6512531,14.5628158 12.6512531,9.68104972 C12.6512531,4.7992837 10.9520054,0.841830411 8.85587715,0.841830411 Z"
-                              ></path>
-                            </g>
-                          </g>
-                        </g>
-                      </g>
-                    </g></svg
-                  ><svg
-                    data-v-016b11b2=""
-                    t="1701070060889"
-                    class="preload-header-logo__title"
-                    viewBox="0 0 3200 1024"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    p-id="2145"
-                    width="200"
-                    height="200"
-                  >
-                    <path
-                      data-v-016b11b2=""
-                      d="M50.112 253.76v519.936h234.88c54.432 0 97.408-10.208 127.488-30.592 35.072-24.768 52.992-63.36 52.992-115.776 0-34.944-8.608-63.36-25.088-83.744-17.184-21.12-42.24-34.944-75.904-41.504 25.792-10.208 45.12-24 58.72-42.976 13.6-20.384 20.8-45.12 20.8-74.24 0-39.36-13.632-70.656-40.128-93.952-28.64-24.768-68.736-37.12-119.584-37.12H50.112z m83.808 69.92h129.6c34.368 0 58.72 5.824 74.496 17.472 14.304 10.912 22.176 29.12 22.176 53.888 0 26.944-7.872 46.592-22.176 58.976-15.04 11.648-40.128 18.24-75.936 18.24H133.92v-148.576z m0 218.464h141.056c37.216 0 64.448 6.528 81.6 19.648 16.512 13.12 25.088 34.24 25.088 64.064 0 29.12-11.456 49.536-34.368 62.624-17.92 10.208-42.976 15.296-74.464 15.296H133.92v-161.632zM592.192 243.584c-15.744 0-28.64 5.12-39.36 15.296-10.752 10.176-15.776 23.296-15.776 39.328 0 16 5.024 29.12 15.776 40.032 10.72 10.208 23.616 15.296 39.36 15.296 15.776 0 28.64-5.12 39.392-15.296 10.752-10.176 16.48-24 16.48-40.032 0-16.032-5.76-29.12-15.776-39.36-10.72-10.176-24.32-15.264-40.096-15.264z m-40.8 153.632v376.48h81.6V397.216h-81.6zM887.936 387.04c-50.112 0-90.944 17.472-121.728 52.416-31.52 34.944-46.56 80.832-46.56 137.6 0 56.832 15.04 102.72 46.56 136.928 30.784 33.504 71.616 50.976 121.728 50.976 45.824 0 82.336-19.648 109.568-58.24v55.328c0 66.976-30.784 100.48-92.384 100.48-28.64 0-49.408-4.352-62.304-12.384-13.6-8.736-22.176-23.296-26.496-44.416h-81.6c7.136 42.24 24.32 72.832 51.52 93.216 27.2 18.944 66.624 29.12 118.88 29.12 116 0 174.016-59.712 174.016-178.4V397.216h-81.632v45.888c-27.2-37.856-63.744-56.064-109.568-56.064z m12.896 66.976c30.784 0 55.136 10.944 72.32 32.768 16.48 21.856 25.056 51.712 25.056 90.304 0 37.856-8.576 66.976-25.056 88.832-17.184 20.384-41.536 31.328-73.024 31.328-35.84 0-60.896-12.384-76.64-36.416-13.6-20.384-20.032-48.064-20.032-83.744 0-39.328 8.576-69.184 25.76-90.304 17.184-21.824 40.832-32.768 71.616-32.768zM1399.232 243.584c-78.784 0-140.352 25.472-184.768 77.92-42.976 49.504-63.712 113.6-63.712 192.96 0 78.656 20.736 142.72 63.712 192.256 44.416 50.976 105.984 77.184 184.768 77.184 51.52 0 96.64-11.648 133.888-33.504 18.624 24.768 38.72 48.576 58.048 76.992l57.248-43.52c-18.624-27.648-42.24-55.328-60.864-80.064 40.096-48.064 60.864-111.424 60.864-189.344 0-80.096-21.472-144.896-64.448-193.696-45.12-51.712-106.688-77.184-184.736-77.184z m0 75.008c52.96 0 93.76 16.736 122.432 51.68 27.904 34.976 42.24 83.008 42.24 144.192 0 50.24-10.016 91.744-28.64 123.776-24.32-29.12-41.28-51.168-68.48-83.136l-50.88 45.28c20.48 26.72 44.16 55.36 69.952 87.36-24.32 13.856-52.992 21.12-86.656 21.12-52.992 0-94.496-18.176-123.136-53.856-27.936-34.976-41.536-81.568-41.536-140.544 0-59.712 13.6-106.304 41.536-141.28 29.344-36.384 70.144-54.592 123.136-54.592zM1720 397.216v234.496c0 101.216 44.416 152.192 133.216 152.192 45.824 0 84.48-19.68 116-59.008v48.8h81.632V397.216h-81.6v230.112c-7.2 26.944-19.36 48.064-35.84 64.096-16.448 15.264-33.664 23.296-51.52 23.296-28.672 0-48.736-7.296-61.6-21.12-12.896-14.56-18.624-36.416-18.624-67.008v-229.376H1720zM2305.056 387.04c-47.264 0-84.48 8-111.68 25.472-32.256 18.944-52.288 49.536-60.16 91.04l80.896 6.528c4.32-19.648 15.04-34.24 30.816-43.68 13.6-8.736 31.488-12.384 54.4-12.384 52.992 0 79.488 24.032 79.488 73.568v14.56l-80.896 2.176c-54.432 1.44-96.672 13.12-126.752 34.944-32.96 22.592-48.704 55.36-48.704 97.6 0 31.296 11.456 56.768 34.368 77.184 22.208 19.648 52.288 29.856 90.944 29.856 32.224 0 60.16-5.824 83.776-16.768a145.056 145.056 0 0 0 52.992-42.944v49.504h75.936v-240.32c0-45.856-11.488-80.8-34.4-104.832-25.76-27.68-66.56-41.504-121.024-41.504z m73.792 214.816v18.912c0 29.12-11.488 53.152-32.96 72.096-21.472 18.208-48 27.68-79.488 27.68-17.92 0-32.224-5.12-43.68-13.856-11.456-8.736-16.48-19.648-16.48-32.768 0-45.12 32.224-68.448 97.408-69.888l75.2-2.176zM2737.6 387.04c-22.208 0-42.24 4.352-60.896 13.824-17.888 8.736-34.368 22.56-48.672 40.064v-43.712h-81.632v376.48h81.6V547.2c2.88-29.856 12.928-53.152 30.08-69.184a74.08 74.08 0 0 1 53.024-21.856c55.84 0 83.776 30.592 83.776 92.48v225.024h81.6v-232.32c0-103.36-46.528-154.336-138.88-154.336zM3078.464 275.616H2996.8v121.6h-66.56v68.48h66.56v212.608c0 30.592 7.168 53.152 21.504 69.184 15.04 17.472 38.656 26.24 70.88 26.24h62.304v-68.48h-48.704c-8.576 0-14.304-2.176-18.592-6.56-4.32-5.088-5.76-11.648-5.76-20.384v-212.64h82.368v-68.448h-82.336v-121.6z"
-                      fill="#000000"
-                      p-id="2146"
-                    ></path></svg></a
-                ><a
-                  nofollow
-                  class="preload-c-header-b"
-                  target="_blank"
-                  href="https://bigai.cn/product-bigquant/"
-                  ><span>了解企业版</span></a
-                ></div
-              >
-              <div data-v-090ae92c="" class="preload-c-header-center">
-                <nav data-v-090ae92c="" class="preload-c-header-nav">
-                  <ul data-v-090ae92c="" class="preload-c-header-nav-ul">
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/">首页</a></span
-                      ></li
-                    >
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/aistudio">编写策略</a></span
-                      >
-                    </li>
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/data/home">数据平台</a></span
-                      >
-                    </li>
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/alpha">因子研究</a></span
-                      >
-                    </li>
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/trading">我的交易</a></span
-                      >
-                    </li>
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/college">量化学院</a
-                        ><svg
-                          data-v-090ae92c=""
-                          class="preload-kb-icon preload-kb-menu-arrow"
-                          t="1706248232063"
-                          viewBox="0 0 1024 1024"
-                          version="1.1"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M512 710.4L166.4 364.8c-12.8-12.8-12.8-32 0-44.8s32-12.8 44.8 0l294.4 294.4L800 320c12.8-12.8 32-12.8 44.8 0s12.8 32 0 44.8L512 710.4z"
-                          ></path>
-                        </svg>
-                      </span>
-                    </li>
-                    <li data-v-090ae92c="" class="preload-c-header-nav-li"
-                      ><span data-v-090ae92c="" class="preload-c-header-nav-li-span"
-                        ><a data-v-090ae92c="" href="/wiki/home">知识库</a
-                        ><svg
-                          data-v-090ae92c=""
-                          class="preload-kb-icon preload-kb-menu-arrow"
-                          t="1706248232063"
-                          viewBox="0 0 1024 1024"
-                          version="1.1"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M512 710.4L166.4 364.8c-12.8-12.8-12.8-32 0-44.8s32-12.8 44.8 0l294.4 294.4L800 320c12.8-12.8 32-12.8 44.8 0s12.8 32 0 44.8L512 710.4z"
-                          ></path></svg
-                      ></span>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-              <div data-v-090ae92c="" class="preload-c-header-right"
-                ><button
-                  data-v-090ae92c=""
-                  class="preload-bq-header-btn preload-bq-header-btn-primary"
-                  >免费注册</button
-                ><button data-v-090ae92c="" class="preload-bq-header-btn">登录</button>
-                <svg class="preload-menu preload-kb-icon" viewBox="0 0 1024 1024">
-                  <path
-                    fill="currentColor"
-                    d="M180.608 179.2h661.333333c29.866667 0 51.2 25.6 51.2 51.2 0 29.866667-25.6 51.2-51.2 51.2h-661.333333c-29.866667 0-51.2-25.6-51.2-51.2s21.333333-51.2 51.2-51.2zM180.608 460.8h661.333333c29.866667 0 51.2 25.6 51.2 51.2 0 29.866667-25.6 51.2-51.2 51.2h-661.333333c-29.866667 0-51.2-25.6-51.2-51.2 0-29.866667 21.333333-51.2 51.2-51.2zM180.608 733.866667h661.333333c29.866667 0 51.2 25.6 51.2 51.2 0 29.866667-25.6 51.2-51.2 51.2h-661.333333c-29.866667 0-51.2-25.6-51.2-51.2s21.333333-51.2 51.2-51.2z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </header>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Framework Source Summary</div>
+        <h1>资产配置 vs 风险配置：宏观风险配置框架</h1>
+        <p>这是为本地预览和 GitHub Pages 准备的静态摘要页，用来替代原始外部网页壳文件。原文件依赖第三方站点接口，离线或镜像后容易出现 `sys.api.errMsg501` 一类错误。</p>
+        <p>这份资料的核心价值，在于把“按资金分配”转成“按底层风险来源分配”，为核心-卫星结构和再平衡纪律提供方法论基础。</p>
+        <div class="meta">
+          <span class="pill">风险配置</span>
+          <span class="pill">核心-卫星</span>
+          <span class="pill">组合底座</span>
         </div>
-        <main class="content"> </main>
-        <div class="footer">
-          <div class="content">
-            <div class="section section1">
-              <div class="section-header">
-                <h6>关于BigQuant</h6
-                ><a
-                  rel="nofollow"
-                  id="about-icon"
-                  class="btn btn-primary"
-                  data-toggle="collapse"
-                  href="#about-section"
-                  role="button"
-                  aria-expanded="false"
-                  aria-controls="collapseExample"
-                  ><img class="up" src="/static/img/index/bt_title_up.png" alt="up" /><img
-                    class="down"
-                    src="/static/img/index/bt_title_down.png"
-                    alt="down"
-                /></a>
-              </div>
-              <div class="section-content collapse show" id="about-section">
-                <ul>
-                  <li
-                    ><a rel="nofollow" href="https://bigai.cn/about/" target="_blank"
-                      >关于我们</a
-                    ></li
-                  >
-                  <li
-                    ><a rel="nofollow" href="https://bigai.cn/joinus/" target="_blank"
-                      >加入我们</a
-                    ></li
-                  >
-                  <li
-                    ><a rel="nofollow" href="https://bigai.cn/contact/" target="_blank"
-                      >商务合作</a
-                    ></li
-                  >
-                  <li><a rel="nofollow" href="https://bigai.cn/" target="_blank">宽邦科技</a></li>
-                  <li
-                    ><a rel="nofollow" href="/wiki/doc/yonghu-xieyi-oSyCHIHzNm">用户条款</a> /
-                    <a rel="nofollow" href="/wiki/doc/yinsi-shengming-aepc3RuM0h">隐私协议</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="section section2">
-              <div class="section-header">
-                <h6>帮助与支持</h6
-                ><a
-                  rel="nofollow"
-                  id="help-icon"
-                  class="btn btn-primary"
-                  data-toggle="collapse"
-                  href="#help-section"
-                  role="button"
-                  aria-expanded="false"
-                  aria-controls="collapseExample"
-                  ><img class="up" src="/static/img/index/bt_title_up.png" alt="up" /><img
-                    class="down"
-                    src="/static/img/index/bt_title_down.png"
-                    alt="down"
-                /></a>
-              </div>
-              <div class="section-content collapse show" id="help-section">
-                <ul>
-                  <li><a rel="nofollow" href="/wiki/doc/xinshou-zhinan-htT8CrjJJh">新手入门</a></li>
-                  <li><a rel="nofollow" href="/wiki/doc/wenti-aiwyKeWbLe">常见问题</a></li>
-                  <li><a rel="nofollow" href="/tutorial">量化学院</a></li>
-                  <li
-                    ><a rel="nofollow" href="/wiki/collections/e3bd6ee2-2b66-465f-9125-cc51deba9b1b"
-                      >文档</a
-                    ></li
-                  >
-                  <!-- <li><a rel="nofollow" href="/wiki/doc/pingtai-jianyi-icDr3w9aI5">反馈建议</a></li> -->
-                </ul>
-              </div>
-            </div>
-            <div class="section section3">
-              <div class="section-header">
-                <h6>关注我们</h6
-                ><a
-                  rel="nofollow"
-                  id="follow-icon"
-                  class="btn btn-primary"
-                  data-toggle="collapse"
-                  href="#follow-section"
-                  role="button"
-                  aria-expanded="false"
-                  aria-controls="collapseExample"
-                  ><img class="up" src="/static/img/index/bt_title_up.png" alt="up" /><img
-                    class="down"
-                    src="/static/img/index/bt_title_down.png"
-                    alt="down"
-                /></a>
-              </div>
-              <div class="section-content collapse show" id="follow-section">
-                <ul>
-                  <li
-                    ><img
-                      class="icon unselected"
-                      src="/static/img/index/icon_weibo.png"
-                      alt="weibo"
-                      height="13"
-                    /><img
-                      class="icon selected"
-                      src="/static/img/index/icon_weibo_selected.png"
-                      alt="weibo"
-                      height="13"
-                    /><a
-                      rel="nofollow"
-                      href="https://weibo.com/bigquant"
-                      target="_blank"
-                      id="weibo-link"
-                      >微博</a
-                    ></li
-                  >
-                  <li
-                    ><img
-                      class="icon unselected"
-                      src="/static/img/index/icon_zhihu.png"
-                      alt="zhihu"
-                      height="13"
-                    /><img
-                      class="icon selected"
-                      src="/static/img/index/icon_zhihu_selected.png"
-                      alt="zhihu"
-                      height="13"
-                    /><a
-                      rel="nofollow"
-                      href="https://www.zhihu.com/people/bigquant/activities"
-                      target="_blank"
-                      >知乎</a
-                    >
-                  </li>
-                  <li
-                    ><img
-                      class="icon unselected"
-                      src="/static/img/index/icon_bilibili.png"
-                      alt="bilibili"
-                      height="13"
-                    /><img
-                      class="icon selected"
-                      src="/static/img/index/icon_bilibili_selected.png"
-                      alt="bilibili"
-                      height="13"
-                    /><a rel="nofollow" href="https://space.bilibili.com/436358509" target="_blank"
-                      >B站</a
-                    >
-                  </li>
-                </ul>
-                <div id="extra-mobile">
-                  <p>微信公众号</p
-                  ><img src="/static/img/index/ewm_gongzonghao.png" alt="gongzonghao" />
-                </div>
-              </div>
-            </div>
-            <div class="section4">
-              <div class="qrcode-section row">
-                <div
-                  ><img src="/static/img/index/ewm_gongzonghao.png" alt="gongzonghao" />
-                  <p>微信公众号</p>
-                </div>
-                <div
-                  ><img src="/static/img/index/ewm_kefu.png" alt="kefu" />
-                  <p>微信客服</p>
-                </div>
-                <div
-                  ><img src="/static/img/index/ewm_qq.jpg" alt="qq" style="width: 97px" />
-                  <p>用户QQ群</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="copyright">
-            <div class="wrapper">
-              <p
-                >©2022 BigQuant.com -
-                <a rel="nofollow" href="https://beian.miit.gov.cn/">蜀ICP备16017083号-1</a>
-              </p>
-            </div>
-          </div>
-        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>核心观点</h2>
+          <ul>
+            <li>组合不应只看名义资金比例，更要看增长、利率、信用、通胀和流动性这些底层风险来源。</li>
+            <li>核心层更适合承接长期风险配置，目标是稳住组合的回撤和持有体验。</li>
+            <li>卫星层更适合承接阶段性主动观点，用有限预算表达当前最有把握的宏观和行业主线。</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>对当前终端的启发</h2>
+          <ul>
+            <li>首页给“宽基 / 债券 / 现金做核心，行业表达做卫星”，本质不是拍脑袋分桶，而是把风险配置语言落成可执行仓位。</li>
+            <li>再平衡不应只是机械回到初始比例，而应同时结合偏离阈值和宏观触发条件，区分价格偏离与判断失效。</li>
+            <li>这套框架说明，真正可执行的组合往往不是全仓押单一主线，而是先有稳健底盘，再在有限风险预算内表达主动判断。</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>为什么适合核心-卫星结构</h2>
+          <ul>
+            <li>核心层承接长期可持有资产，例如宽基、利率债、信用债、现金和必要的对冲资产。</li>
+            <li>卫星层承接宏观与行业观点，例如金融高股息、制造升级、黄金或政策主题。</li>
+            <li>当 PMI、PPI、社融、企业中长贷或消费修复路径偏离原判断时，应优先收缩卫星层，再决定是否重估核心层中枢。</li>
+          </ul>
+        </section>
       </div>
-    </div>
-    <script>
-      function reportPerformance() {
-        window.loadArr = [];
-        function report(eventName, props) {
-          if (!eventName) return;
-          if (window.bigTelemetry && window.bigTelemetryFunc) {
-            window.bigTelemetryFunc(eventName, props);
-          } else {
-            window.loadArr.push({ eventName, properties: props });
-          }
-        }
 
-        const vitalsObserver = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry) => {
-            const { name, startTime, value, duration } = entry;
-            if (name) {
-              report(entry.entryType, { name, startTime, value: value || duration });
-            }
-          });
-        });
-        vitalsObserver.observe({
-          type: 'largest-contentful-paint',
-          buffered: true,
-        }); // LCP - 最大内容绘制
-        vitalsObserver.observe({ type: 'layout-shift', buffered: true }); // CLS - 累积布局偏移
-        vitalsObserver.observe({ type: 'longtask', buffered: true }); // 长任务执行
-        window.addEventListener('load', () => {
-          const nav = performance.getEntriesByType('navigation')[0];
-          const navMetrics = {
-            dns: nav.domainLookupEnd - nav.domainLookupStart,
-            tcp: nav.connectEnd - nav.connectStart,
-            ssl: nav.secureConnectionStart ? nav.connectEnd - nav.secureConnectionStart : 0,
-            ttfb: nav.responseStart - nav.requestStart,
-            download: nav.responseEnd - nav.responseStart,
-            domReady: nav.domContentLoadedEventEnd - nav.startTime,
-            load: nav.loadEventEnd - nav.startTime,
-          };
-          report('navigation', navMetrics);
-          // 首次 Paint/FCP
-          performance.getEntriesByName('first-paint').forEach((e) => {
-            report('paint', {
-              name: e.name,
-              value: e.startTime,
-            });
-          });
-        });
-      }
-      const bigquantReg = /bigquant\.com|bigquant\.ai/;
-      const pocReg = /poc/g;
-      if (pocReg.test(window.location.origin) || !bigquantReg.test(window.location.origin)) {
-        const indexEle = document.querySelector('.page');
-        if (indexEle) {
-          indexEle.style.display = 'none';
-        }
-      }
-
-      if (bigquantReg.test(window.location.hostname)) {
-        reportPerformance();
-      }
-    </script>
-    <script src="https://cdn.bigquant.com/_app.config.js?v=1.3.51-1776165225839"></script><script type="module" crossorigin src="https://cdn.bigquant.com/assets/index.DQW24CJm.js"></script><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.0c050ada3e101f444ecce2f673167017.iVVNFC9M.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.fede6b96f2984a82efdd2b844b40e4b3.DN_vAjh5.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.b46d52207c014698ee7eaa24d2b923bf.CvLPyh3B.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.f1a02a1ae7fa47b237f875a1e98ba21e.BC_9Ut2H.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.13d3464b13e18d062812c818b64e1045.DZkDifb2.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.misc.BKTl-Mi2.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.de2c1da195b0ade6a4ad6899eccdb456.B7HdOPZu.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.eb6677555573f02990f41d7923105813.BE99p35k.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.44596c2ba4759a2dd6249b7b91376c62.ChyauXzh.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.5bbf2d6725b29ad8ddb7c3ab47c50930.0X-QXdqI.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.2ccb3dd497d7df8fcf5902323a6189d7.Cqk4jvQz.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.951c1f757a9f918f0624cd5cb90b890d.7z8pnJ0u.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.71a1c81fe97d5312f7e533a0824439ee.DdqQRotv.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.5698e0a8eef0740c3a7dc35955ac7b18.BjznVih3.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.cf620680b96165efbbe2163c95118107.BqIH7s4d.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.38c3787939c7b0b6c77d73fce3d28891.Bm4tCq1O.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.304854e2e79de0f96dc5477fef38a18f.Dg8SWyu2.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.c39e8ac279bb53cb06ad235bb3697365.CDE7jhPe.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.4240b7e2b857a912f4ec4760b53f9bf9.Nsi-D4Ag.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.2231c9086408956fb3cc9e2e4b7837b8.BvQuOtMh.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.3e0d2ecce056064524069b105211665f.BrBS8ybP.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.c5c487e86ce941c3a015f8abc135b7dd.Cz5hrqOU.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.a4aa4f50d93dfcdaa1db0baeae81313e.CkFk_Ecl.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.cfab1e9b87928cfd9d5f5c8ad121a379.Cbp8y9Ri.js"><link rel="modulepreload" crossorigin href="https://cdn.bigquant.com/assets/vendor.cc31a9d7a86a6f32932208d2b28f4f1c.-uQUmeOX.js"><link rel="stylesheet" crossorigin href="https://cdn.bigquant.com/assets/vendor.CsDyMF1F.css"><link rel="stylesheet" crossorigin href="https://cdn.bigquant.com/assets/vendor.CybsIN5x.css"><link rel="stylesheet" crossorigin href="https://cdn.bigquant.com/assets/vendor.DDfP9NW9.css"><link rel="stylesheet" crossorigin href="https://cdn.bigquant.com/assets/vendor.qaNWzHXB.css"><link rel="stylesheet" crossorigin href="https://cdn.bigquant.com/assets/index.Rlcvphlu.css"><link rel="manifest" href="/manifest.webmanifest"><a data-v-016b11b2="" class="preload-header-logo" href="/" target="_blank"><a nofollow class="preload-c-header-b" target="_blank" href="https://bigai.cn/product-bigquant/"><a data-v-090ae92c="" href="/"><a data-v-090ae92c="" href="/aistudio"><a data-v-090ae92c="" href="/data/home"><a data-v-090ae92c="" href="/alpha"><a data-v-090ae92c="" href="/trading"><a data-v-090ae92c="" href="/college"><a data-v-090ae92c="" href="/wiki/home"><a rel="nofollow" href="/hub/" onclick="redirectTo('/hub/', 'AI', '', event)" class="fold_button"><a href="/wiki/collections/c4a96149-d38a-4052-9f15-5df1abe352b2" onclick="redirectTo('/wiki/collections/c4a96149-d38a-4052-9f15-5df1abe352b2', 'learning', '', event)"><a rel="nofollow" href="/hub/" onclick="redirectTo('/hub/', 'strategy', '', event)"><a rel="nofollow" href="/trading#tab=live_trading" onclick="redirectTo('/trading#tab=live_trading', 'trade apply', '', event)"><a rel="nofollow" href="/hub/" onclick="redirectTo('/hub/', 'custom', '', event)"><a rel="nofollow" id="about-icon" class="btn btn-primary" data-toggle="collapse" href="#about-section" role="button" aria-expanded="false" aria-controls="collapseExample"><a rel="nofollow" href="https://bigai.cn/about/" target="_blank"><a rel="nofollow" href="https://bigai.cn/joinus/" target="_blank"><a rel="nofollow" href="https://bigai.cn/contact/" target="_blank"><a rel="nofollow" href="https://bigai.cn/" target="_blank"><a rel="nofollow" href="/wiki/doc/yonghu-xieyi-oSyCHIHzNm"><a rel="nofollow" href="/wiki/doc/yinsi-shengming-aepc3RuM0h"><a rel="nofollow" id="help-icon" class="btn btn-primary" data-toggle="collapse" href="#help-section" role="button" aria-expanded="false" aria-controls="collapseExample"><a rel="nofollow" href="/wiki/doc/xinshou-zhinan-htT8CrjJJh"><a rel="nofollow" href="/wiki/doc/wenti-aiwyKeWbLe"><a rel="nofollow" href="/tutorial"><a rel="nofollow" href="/wiki/collections/e3bd6ee2-2b66-465f-9125-cc51deba9b1b"><a rel="nofollow" id="follow-icon" class="btn btn-primary" data-toggle="collapse" href="#follow-section" role="button" aria-expanded="false" aria-controls="collapseExample"><a rel="nofollow" href="https://weibo.com/bigquant" target="_blank" id="weibo-link"><a rel="nofollow" href="https://www.zhihu.com/people/bigquant/activities" target="_blank"><a rel="nofollow" href="https://space.bilibili.com/436358509" target="_blank"><a rel="nofollow" href="https://beian.miit.gov.cn/">
+      <section class="note">
+        <strong>说明：</strong>这不是原始网页的逐字镜像，而是基于本地研究整理出的稳定阅读版本，专门用于站内“参考来源”跳转。
+      </section>
+    </main>
   </body>
 </html>

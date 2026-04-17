@@ -1623,7 +1623,7 @@ function renderFrameworks() {
             if (!item.url || item.url === "本地理论稿") {
               return `<li>${escapeHtml(item.label)}</li>`;
             }
-            return `<li><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.label)}</a></li>`;
+            return `<li><a href="${encodePathForHref(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.label)}</a></li>`;
           })
           .join("")}</ul>
       </section>
