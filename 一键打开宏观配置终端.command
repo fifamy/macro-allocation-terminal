@@ -3,9 +3,11 @@ set -e
 cd "$(dirname "$0")"
 
 BUNDLE_FILE="data/macro_allocation_bundle.js"
+PREVIEW_FILE=".macro_terminal_preview.html"
 
 PORT=8765
-URL="http://127.0.0.1:${PORT}/index.html?ts=$(date +%s)"
+TS=$(date +%s)
+URL="http://127.0.0.1:${PORT}/${PREVIEW_FILE}?ts=${TS}"
 
 if [ ! -f "${BUNDLE_FILE}" ]; then
   echo "未找到 ${BUNDLE_FILE}，先执行一次数据更新..."
@@ -17,6 +19,10 @@ if [ -n "${OLD_PID}" ]; then
   kill "${OLD_PID}" 2>/dev/null || true
   sleep 1
 fi
+
+perl -0pe \
+  "s{href=\"\\./styles\\.css\"}{href=\"./styles.css?ts=${TS}\"}g; s{src=\"\\./data/macro_allocation_bundle\\.js\"}{src=\"./data/macro_allocation_bundle.js?ts=${TS}\"}g; s{src=\"\\./app\\.js\"}{src=\"./app.js?ts=${TS}\"}g" \
+  "index.html" > "${PREVIEW_FILE}"
 
 echo ""
 echo "启动本地网页服务..."
