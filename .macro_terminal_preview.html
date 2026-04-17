@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>宏观配置终端 · Macro Allocation Terminal</title>
+    <meta name="description" content="面向内部投研与FOF团队的宏观经济与大类资产配置展示终端。" />
+    <link rel="stylesheet" href="./styles.css?ts=1776410904" />
+  </head>
+  <body>
+
+    <!-- ── TOPBAR ─────────────────────────────────── -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="topbar-logo">M</div>
+        <div>
+          <div class="topbar-name">Macro Terminal</div>
+          <div class="topbar-sub">大类资产配置研究系统</div>
+        </div>
+      </div>
+      <nav class="topbar-tabs" id="main-tabs" role="tablist" aria-label="主导航"></nav>
+      <div class="topbar-status">
+        <div class="status-dot"></div>
+        <span class="status-label">研究终端已加载</span>
+        <div class="report-review-filter" id="report-review-filter" role="group" aria-label="外部报告筛选"></div>
+      </div>
+    </header>
+
+    <!-- ── BODY SHELL ─────────────────────────────── -->
+    <div class="shell">
+
+      <!-- ── SIDEBAR ─────────────────────────────── -->
+      <aside class="sidebar">
+        <div class="sidebar-stack">
+          <div class="hero-card">
+            <div class="hero-kicker">Macro Allocation Terminal</div>
+            <h1>宏观经济与大类资产配置研究</h1>
+            <p id="hero-summary">用于统一展示宏观框架、历史复盘、当前判断与大类资产配置建议。</p>
+            <div class="hero-brief-grid">
+              <div class="hero-focus-card">
+                <span class="hero-focus-label">当前主判断</span>
+                <strong id="hero-state">—</strong>
+              </div>
+              <div class="hero-mini-stack">
+                <div class="hero-mini-card">
+                  <span>国内主线</span>
+                  <strong id="hero-domestic">—</strong>
+                </div>
+                <div class="hero-mini-card">
+                  <span>海外主线</span>
+                  <strong id="hero-overseas">—</strong>
+                </div>
+              </div>
+            </div>
+            <div class="hero-meta">
+              <div class="meta-item">
+                <span class="meta-label">截至日期</span>
+                <strong id="hero-date">—</strong>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">判断置信度</span>
+                <strong id="hero-confidence">—</strong>
+              </div>
+            </div>
+            <div id="hero-validation"></div>
+            <div class="tag-group" id="hero-regimes"></div>
+          </div>
+
+          <div class="sidebar-insight-grid">
+            <div class="side-card side-card-summary">
+              <div class="side-title">当前判断摘要</div>
+              <div id="current-summary-points"></div>
+            </div>
+
+            <div class="side-card side-card-risk">
+              <div class="side-title">当前主要风险</div>
+              <div id="current-risk-points"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ── MAIN ───────────────────────────────── -->
+      <main class="main">
+
+        <!-- Overview -->
+        <section class="panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" aria-hidden="false">
+          <div class="overview-grid">
+            <div class="card overview-main">
+              <div class="section-head">
+                <div>
+                  <h2>当前宏观状态</h2>
+                  <p>用多框架交叉验证当前宏观环境，并落地到资产配置方向。</p>
+                </div>
+              </div>
+              <div class="summary-grid" id="macro-summary-cards"></div>
+            </div>
+
+            <div class="card overview-side">
+              <div class="section-head compact">
+                <div>
+                  <h2>框架使用情况</h2>
+                  <p>当前判断所依赖的核心分析框架。</p>
+                </div>
+              </div>
+              <div id="framework-pills"></div>
+              <div id="framework-reading-intro"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>数据驱动周期判断</h2>
+                <p>把最新导入的增长、通胀、信用、库存和市场数据转成可讨论的周期位置，用来和首页主观判断互相校验。</p>
+              </div>
+            </div>
+            <div id="overview-data-driven-view"></div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>当前大类资产配置建议</h2>
+                <p>采用"方向 + 权重区间"的展示口径，兼顾专业性与灵活度。</p>
+              </div>
+            </div>
+            <div id="allocation-calibration-summary"></div>
+            <div class="allocation-grid" id="allocation-grid"></div>
+          </div>
+
+          <div class="card">
+            <div id="china-macro-allocation-module"></div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>当前判断依据</h2>
+                <p>将增长、通胀、信用、流动性与海外因素压缩成便于讨论的决策摘要。</p>
+              </div>
+            </div>
+            <div class="reason-grid">
+              <div>
+                <h3 class="reason-title">核心驱动</h3>
+                <ul class="bullet-list" id="driver-list"></ul>
+              </div>
+              <div>
+                <h3 class="reason-title">配置备注</h3>
+                <ul class="bullet-list" id="notes-list"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>当前研究导航</h2>
+                <p>把当前宏观判断直接串到对应情景与资产配置动作，形成可执行的研究导航入口。</p>
+              </div>
+            </div>
+            <div id="overview-research-path"></div>
+          </div>
+        </section>
+
+        <!-- Frameworks -->
+        <section class="panel" id="panel-frameworks" role="tabpanel" aria-labelledby="tab-frameworks" hidden aria-hidden="true">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>理论框架库</h2>
+                <p>按统一研究模板组织每个框架的思想、方法、机制、资产表现、指标、本土应用、历史表现与局限性。</p>
+              </div>
+            </div>
+            <div class="framework-grid" id="framework-grid"></div>
+            <div class="framework-knowledge-layout">
+              <aside class="framework-outline" id="framework-outline"></aside>
+              <div id="framework-detail"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Scenarios -->
+        <section class="panel" id="panel-scenarios" role="tabpanel" aria-labelledby="tab-scenarios" hidden aria-hidden="true">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>宏观情景与资产表现</h2>
+                <p>把不同框架映射成统一情景卡，再看各资产的理论排序与配置思路。</p>
+              </div>
+            </div>
+            <div class="scenario-toggle" id="scenario-toggle"></div>
+            <div class="panel-grid two-col">
+              <div class="scenario-detail" id="scenario-detail"></div>
+              <div class="scenario-assets" id="scenario-assets"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Assets -->
+        <section class="panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets" hidden aria-hidden="true">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>资产映射库</h2>
+                <p>从资产本身出发，看核心驱动、配置角色、适用情景与常见误用，便于把宏观判断落实到具体资产语言。</p>
+              </div>
+            </div>
+            <div class="index-intro-block" id="assets-index-intro"></div>
+            <div id="asset-focus-banner"></div>
+            <div class="asset-library-grid" id="asset-library-grid"></div>
+          </div>
+        </section>
+
+        <!-- History -->
+        <section class="panel" id="panel-history" role="tabpanel" aria-labelledby="tab-history" hidden aria-hidden="true">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>历史阶段复盘</h2>
+                <p>把理论框架落到具体时期，观察宏观背景、资产表现与可复盘结论。</p>
+              </div>
+            </div>
+            <div class="history-grid" id="history-grid"></div>
+          </div>
+        </section>
+
+        <!-- Indicators -->
+        <section class="panel" id="panel-indicators" role="tabpanel" aria-labelledby="tab-indicators" hidden aria-hidden="true">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>宏观经济仪表盘</h2>
+                <p>优先接入外部宏观数据中的高频可用序列，同时保留人工研究判断，形成“价格先行 + 总量待验”的双层看板。</p>
+              </div>
+            </div>
+            <div id="macro-dashboard-root"></div>
+            <div class="indicator-manual-section">
+              <div class="section-head compact">
+                <div>
+                  <h2>数据驱动补充</h2>
+                  <p>把周期判断、高频商品信号和资产含义压缩成便于讨论的解释层，减少对静态手工分组的依赖。</p>
+                </div>
+              </div>
+              <div class="indicator-groups" id="indicator-groups"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Methods -->
+        <section class="panel" id="panel-methods" role="tabpanel" aria-labelledby="tab-methods" hidden aria-hidden="true">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>配置方法论</h2>
+                <p>解释"方向判断"与"权重分配"如何衔接，避免只讲观点不讲组合。</p>
+              </div>
+            </div>
+            <div class="index-intro-block" id="methods-index-intro"></div>
+            <div class="method-grid" id="method-grid"></div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <script src="./data/macro_allocation_bundle.js?ts=1776410904"></script>
+    <script src="./app.js?ts=1776410904"></script>
+  </body>
+</html>

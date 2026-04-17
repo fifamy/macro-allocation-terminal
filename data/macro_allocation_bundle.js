@@ -2541,11 +2541,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "基于普林格经济周期六段论：大类资产配置框架",
-          "url": "外部研究报告/2021-06-08_德邦证券_基于普林格经济周期六段论：大类资产配置框架.pdf"
+          "url": "content/framework-sources/pring-six-stage-asset-allocation-20210608.pdf"
         },
         {
           "label": "普林格经济周期六段论深化：普林格配置框架的难点与应用",
-          "url": "外部研究报告/2021-07-21_德邦证券_普林格经济周期六段论深化：普林格配置框架的难点与应用.pdf"
+          "url": "content/framework-sources/pring-six-stage-deep-dive-20210721.pdf"
         }
       ],
       "tags": [
@@ -2641,11 +2641,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "基于“货币-信用-实体”的三维投资框架",
-          "url": "research-task/reports/29_货币信用实体三元框架与行业轮动.pdf"
+          "url": "content/framework-sources/money-credit-entity-and-sector-rotation.pdf"
         },
         {
           "label": "宏观经济与大类资产研究框架",
-          "url": "research-task/reports/05_宏观经济与大类资产配置研究框架.pdf"
+          "url": "content/framework-sources/macro-asset-allocation-framework.pdf"
         }
       ],
       "tags": [
@@ -2742,11 +2742,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "宏观环境对资产价格的影响：四个角度",
-          "url": "research-task/reports/28_宏观环境对资产价格的影响_四个角度.pdf"
+          "url": "content/framework-sources/four-dimensional-macro-environment.pdf"
         },
         {
           "label": "宏观经济与大类资产配置研究框架",
-          "url": "research-task/reports/05_宏观经济与大类资产配置研究框架.pdf"
+          "url": "content/framework-sources/macro-asset-allocation-framework.pdf"
         }
       ],
       "tags": [
@@ -2844,15 +2844,15 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "货币信用实体三元框架与行业轮动",
-          "url": "research-task/reports/29_货币信用实体三元框架与行业轮动.pdf"
+          "url": "content/framework-sources/money-credit-entity-and-sector-rotation.pdf"
         },
         {
           "label": "基于普林格经济周期六段论：A股板块与行业轮动规律探索",
-          "url": "外部研究报告/2021-06-16_德邦证券_基于普林格经济周期六段论：A股板块与行业轮动规律探索.pdf"
+          "url": "content/framework-sources/pring-six-stage-sector-rotation-20210616.pdf"
         },
         {
           "label": "量化经济周期系列研究之二：宏、中观复合周期驱动下的行业择时与配置策略",
-          "url": "外部研究报告/2024-05-05_招商证券_量化经济周期系列研究之二：宏、中观复合周期驱动下的行业择时与配置策略.pdf"
+          "url": "content/framework-sources/china-sector-timing-composite-cycle-20240505.pdf"
         }
       ],
       "tags": [
@@ -2933,15 +2933,15 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "资产配置 vs 风险配置：宏观风险配置框架",
-          "url": "research-task/reports/17_资产配置_vs_风险配置_宏观风险配置框架.html"
+          "url": "content/framework-sources/asset-vs-risk-allocation-framework.html"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2024年8月）",
-          "url": "research-task/reports/20_基于宏观因子风险预算的股债资产配置策略_2024年8月.pdf"
+          "url": "content/framework-sources/macro-factor-risk-budget-202408.pdf"
         },
         {
           "label": "大类资产配置系列之五：穿越经济周期-中国版全天候配置策略",
-          "url": "外部研究报告/2019-11-25_太平洋_大类资产配置系列之五：穿越经济周期-中国版全天候配置策略.pdf"
+          "url": "content/framework-sources/china-all-weather-strategy-20191125.pdf"
         }
       ],
       "tags": [
@@ -3017,15 +3017,15 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2021）",
-          "url": "research-task/reports/12_基于宏观因子风险预算的股债资产配置策略_202103.pdf"
+          "url": "content/framework-sources/macro-factor-risk-budget-202103.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
+          "url": "content/framework-sources/macro-factor-risk-budget-202312.pdf"
         },
         {
           "label": "宏观因子投资体系下的风险动态配置系统",
-          "url": "research-task/reports/18_宏观因子投资体系下的风险动态配置系统.html"
+          "url": "content/framework-sources/macro-factor-dynamic-risk-system.html"
         }
       ],
       "tags": [
@@ -10048,7 +10048,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-17 15:27:50",
+    "generated_at": "2026-04-17 15:35:00",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",
