@@ -1,0 +1,10 @@
+.DS_Store
+.claude/
+.venv/
+
+research-task/generated/external-reports/cache/
+research-task/reports/
+
+外部宏观数据/*.xlsx
+
+*.log

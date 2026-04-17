@@ -1,0 +1,241 @@
+{
+  "meta": {
+    "description": "用于补充当前 Excel 导出中不存在的宏观时间序列。保留空数组表示暂未补数。",
+    "supported_fields": [
+      "date",
+      "value"
+    ],
+    "date_format": "YYYY-MM-DD",
+    "online_sources": {
+      "CX_PMI_MFG": {
+        "label": "InsiderStreet Caixin PMI",
+        "url": "https://www.moneycontrol.com/economic-calendar/chn-caixin-manufacturing-pmi/1864844"
+      },
+      "LME_COPPER": {
+        "label": "FRED PCOPPUSDM",
+        "url": "https://fred.stlouisfed.org/series/PCOPPUSDM",
+        "note": "使用公开可得的全球铜价月度序列作为 LME 铜价替代。"
+      },
+      "CSI300_DIVYIELD": {
+        "label": "乐咕乐股沪深300成分股",
+        "url": "https://www.legulegu.com/stockdata/index-basic-composition?indexCode=000300.SH"
+      }
+    },
+    "last_online_fetch_at": "2026-04-16 18:41:29",
+    "online_fetch_status": {
+      "CX_PMI_MFG": {
+        "status": "cached",
+        "note": "今天已抓取过，沿用本地缓存 46 条记录，最新 2025-06-30",
+        "record_count": 46,
+        "latest_date": "2025-06-30"
+      },
+      "LME_COPPER": {
+        "status": "cached",
+        "note": "今天已尝试抓取但源不可用，跳过重复请求",
+        "record_count": 0,
+        "latest_date": ""
+      },
+      "CSI300_DIVYIELD": {
+        "status": "cached",
+        "note": "今天已抓取过，沿用本地缓存 1 条记录，最新 2026-04-16",
+        "record_count": 1,
+        "latest_date": "2026-04-16"
+      }
+    }
+  },
+  "series": {
+    "CX_PMI_MFG": [
+      {
+        "date": "2016-07-31",
+        "value": 48.6
+      },
+      {
+        "date": "2016-08-31",
+        "value": 50.6
+      },
+      {
+        "date": "2016-11-30",
+        "value": 51.2
+      },
+      {
+        "date": "2018-04-30",
+        "value": 51.0
+      },
+      {
+        "date": "2019-01-31",
+        "value": 49.7
+      },
+      {
+        "date": "2019-02-28",
+        "value": 48.3
+      },
+      {
+        "date": "2019-04-30",
+        "value": 50.8
+      },
+      {
+        "date": "2019-09-30",
+        "value": 50.4
+      },
+      {
+        "date": "2019-11-30",
+        "value": 51.7
+      },
+      {
+        "date": "2019-12-31",
+        "value": 51.8
+      },
+      {
+        "date": "2020-01-31",
+        "value": 51.5
+      },
+      {
+        "date": "2020-06-30",
+        "value": 50.7
+      },
+      {
+        "date": "2020-10-31",
+        "value": 53.6
+      },
+      {
+        "date": "2021-01-31",
+        "value": 51.5
+      },
+      {
+        "date": "2021-03-31",
+        "value": 50.6
+      },
+      {
+        "date": "2021-05-31",
+        "value": 52.0
+      },
+      {
+        "date": "2021-06-30",
+        "value": 51.3
+      },
+      {
+        "date": "2021-08-31",
+        "value": 49.2
+      },
+      {
+        "date": "2021-09-30",
+        "value": 50.0
+      },
+      {
+        "date": "2021-11-30",
+        "value": 49.9
+      },
+      {
+        "date": "2022-01-31",
+        "value": 49.1
+      },
+      {
+        "date": "2022-02-28",
+        "value": 50.4
+      },
+      {
+        "date": "2022-03-31",
+        "value": 48.1
+      },
+      {
+        "date": "2022-04-30",
+        "value": 46.0
+      },
+      {
+        "date": "2022-05-31",
+        "value": 48.1
+      },
+      {
+        "date": "2022-08-31",
+        "value": 49.5
+      },
+      {
+        "date": "2022-09-30",
+        "value": 48.1
+      },
+      {
+        "date": "2022-11-30",
+        "value": 49.4
+      },
+      {
+        "date": "2023-07-31",
+        "value": 49.2
+      },
+      {
+        "date": "2023-09-30",
+        "value": 50.6
+      },
+      {
+        "date": "2023-11-30",
+        "value": 50.7
+      },
+      {
+        "date": "2023-12-31",
+        "value": 50.8
+      },
+      {
+        "date": "2024-01-31",
+        "value": 50.8
+      },
+      {
+        "date": "2024-02-29",
+        "value": 50.9
+      },
+      {
+        "date": "2024-03-31",
+        "value": 51.1
+      },
+      {
+        "date": "2024-04-30",
+        "value": 51.4
+      },
+      {
+        "date": "2024-05-31",
+        "value": 51.7
+      },
+      {
+        "date": "2024-06-30",
+        "value": 51.8
+      },
+      {
+        "date": "2024-07-31",
+        "value": 49.8
+      },
+      {
+        "date": "2024-08-31",
+        "value": 50.4
+      },
+      {
+        "date": "2024-11-30",
+        "value": 51.5
+      },
+      {
+        "date": "2024-12-31",
+        "value": 50.5
+      },
+      {
+        "date": "2025-01-31",
+        "value": 50.1
+      },
+      {
+        "date": "2025-04-30",
+        "value": 50.4
+      },
+      {
+        "date": "2025-05-31",
+        "value": 48.3
+      },
+      {
+        "date": "2025-06-30",
+        "value": 50.4
+      }
+    ],
+    "LME_COPPER": [],
+    "CSI300_DIVYIELD": [
+      {
+        "date": "2026-04-16",
+        "value": 2.866249
+      }
+    ]
+  }
+}

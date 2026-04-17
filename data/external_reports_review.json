@@ -1,0 +1,38 @@
+{
+  "reports": [
+    {
+      "title": "从金融周期、经济周期看国内股、债行情",
+      "review_status": "reviewed",
+      "review_notes": "默认抽到了封底评级页，改为第7页的股债行情汇总图。",
+      "preferred_page_number": 7,
+      "preferred_label": "金融周期、经济周期与股债行情汇总"
+    },
+    {
+      "title": "FICC资产配置深度报告：从油价、商品规律与经济周期，展望资产方向",
+      "review_status": "reviewed",
+      "review_notes": "默认抽到了带站点页眉的无效页，改为第8页的油价、美元和美债关系图。",
+      "preferred_page_number": 8,
+      "preferred_label": "油价与美元指数、美债收益率"
+    },
+    {
+      "title": "经济周期专题：大宗商品价格简史之工业商品",
+      "review_status": "reviewed",
+      "review_notes": "默认抽到了图表目录页，改为第4页的价格走势总览图。",
+      "preferred_page_number": 4,
+      "preferred_label": "1960年以来工业大宗商品价格走势总览"
+    },
+    {
+      "title": "宏观专题报告—当前所处的经济周期位置和未来资本市场展望（PPT）",
+      "review_status": "reviewed",
+      "review_notes": "默认抽到了理论说明页，改为第7页的主动去库存判断页。",
+      "preferred_page_number": 7,
+      "preferred_label": "当前经济仍处在主动去库存阶段"
+    },
+    {
+      "title": "专题报告：再比较2025年与2015年的经济周期和两次结构性改革对权益类、商品市场的影响",
+      "review_status": "needs_source_fix",
+      "review_notes": "PDF 结构损坏严重，当前文本和图页都不可靠，先禁用自动预览，待 OCR 或人工重存后再处理。",
+      "suppress_preview": true
+    }
+  ]
+}
