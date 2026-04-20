@@ -3729,7 +3729,7 @@ body {
 
 .macro-theme-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(380px,1fr));
+  grid-template-columns: repeat(auto-fit,minmax(min(100%,340px),1fr));
   gap: 14px;
   align-items: start;
 }
@@ -3747,7 +3747,7 @@ body {
 .macro-signal-grid {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+  grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr));
   gap: 12px;
 }
 
@@ -3758,6 +3758,7 @@ body {
   padding: 14px;
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .macro-signal-top {
@@ -3765,6 +3766,12 @@ body {
   justify-content: space-between;
   gap: 10px;
   align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.macro-signal-top > div {
+  flex: 1 1 180px;
+  min-width: 0;
 }
 
 .macro-signal-name {
@@ -3772,6 +3779,7 @@ body {
   font-size: 14px;
   font-weight: 700;
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .macro-signal-meta {
@@ -3822,6 +3830,7 @@ body {
   justify-content: space-between;
   gap: 10px;
   align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .macro-signal-value {
@@ -3830,11 +3839,15 @@ body {
   line-height: 1.05;
   font-weight: 800;
   letter-spacing: -0.03em;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .macro-signal-date {
   color: var(--ink-faint);
   font-size: 11px;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .macro-signal-sparkline {
@@ -4214,11 +4227,6 @@ body {
   .overview-state-card.is-hero,
   .overview-state-card.is-validation {
     grid-column: auto;
-  }
-
-  .macro-theme-grid,
-  .macro-signal-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -4733,10 +4741,8 @@ body {
   .macro-coverage-grid,
   .macro-missing-grid { grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); }
   .data-driven-lower,
-  .macro-theme-grid,
   .macro-dashboard-lower { grid-template-columns: 1fr; }
   .research-path-stack { grid-template-columns: 1fr; }
-  .macro-signal-grid { grid-template-columns: 1fr; }
   .research-map-flow { grid-template-columns: 1fr; }
   .research-map-arrow { display: none; }
   .research-path-sep { display: none; }
