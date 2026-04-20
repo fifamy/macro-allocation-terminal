@@ -2982,7 +2982,7 @@ function renderAssets() {
                 if (!item.url || item.url === "本地研究归档") {
                   return `<li>${escapeHtml(item.label)}</li>`;
                 }
-                return `<li><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.label)}</a></li>`;
+                return `<li><a href="${encodePathForHref(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.label)}</a></li>`;
               })
               .join("")}</ul>
           </div>
@@ -3272,7 +3272,7 @@ function renderMacroDashboard() {
                   ${(dashboard.references || [])
                     .map(
                       (item) => `
-                        <a class="macro-reference-item" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+                        <a class="macro-reference-item" href="${encodePathForHref(item.url)}" target="_blank" rel="noreferrer">
                           <span class="macro-reference-title">${escapeHtml(item.title)}</span>
                           <span class="macro-reference-note">${escapeHtml(item.note)}</span>
                         </a>
