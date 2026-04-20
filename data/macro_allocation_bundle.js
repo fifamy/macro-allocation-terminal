@@ -1359,11 +1359,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "宏观环境对资产价格的影响：四个角度",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202008031396014683_1.pdf"
+          "url": "research-task/reports/28_宏观环境对资产价格的影响_四个角度.pdf"
         },
         {
           "label": "大类资产配置更迭与货币信用、库存、产能周期",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202303101584167116_1.pdf?1678456034000.pdf="
+          "url": "research-task/reports/30_大类资产配置更迭与货币信用库存产能周期.pdf"
         }
       ],
       "tags": [
@@ -1695,19 +1695,19 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "宏观经济与大类资产配置研究框架",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202401231617944578_1.pdf"
+          "url": "research-task/reports/05_宏观经济与大类资产配置研究框架.pdf"
         },
         {
           "label": "宏观环境对资产价格的影响：四个角度",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202008031396014683_1.pdf"
+          "url": "research-task/reports/28_宏观环境对资产价格的影响_四个角度.pdf"
         },
         {
           "label": "基于“货币-信用-实体”的三维投资框架",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202206291575498025_1.pdf?1656491686000.pdf="
+          "url": "research-task/reports/29_货币信用实体三元框架与行业轮动.pdf"
         },
         {
           "label": "大类资产配置更迭与货币信用、库存、产能周期",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202303101584167116_1.pdf?1678456034000.pdf="
+          "url": "research-task/reports/30_大类资产配置更迭与货币信用库存产能周期.pdf"
         }
       ],
       "tags": [
@@ -1986,11 +1986,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "库存周期专题",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202310221602715053_1.pdf"
+          "url": "research-task/reports/06_库存周期专题.pdf"
         },
         {
           "label": "大类资产配置更迭与货币信用、库存、产能周期",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202303101584167116_1.pdf?1678456034000.pdf="
+          "url": "research-task/reports/30_大类资产配置更迭与货币信用库存产能周期.pdf"
         }
       ],
       "tags": [
@@ -2275,7 +2275,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "大类资产配置更迭与货币信用、库存、产能周期",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202303101584167116_1.pdf?1678456034000.pdf="
+          "url": "research-task/reports/30_大类资产配置更迭与货币信用库存产能周期.pdf"
         }
       ],
       "tags": [
@@ -3229,7 +3229,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "基于“货币-信用-实体”的三维投资框架",
-          "url": "data/framework-sources/money-credit-entity-and-sector-rotation.pdf"
+          "url": "research-task/reports/29_货币信用实体三元框架与行业轮动.pdf"
         },
         {
           "label": "宏观经济与大类资产研究框架",
@@ -3330,11 +3330,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "宏观环境对资产价格的影响：四个角度",
-          "url": "data/framework-sources/four-dimensional-macro-environment.pdf"
+          "url": "research-task/reports/28_宏观环境对资产价格的影响_四个角度.pdf"
         },
         {
           "label": "宏观经济与大类资产配置研究框架",
-          "url": "data/framework-sources/macro-asset-allocation-framework.pdf"
+          "url": "research-task/reports/05_宏观经济与大类资产配置研究框架.pdf"
         }
       ],
       "tags": [
@@ -3605,11 +3605,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2021）",
-          "url": "data/framework-sources/macro-factor-risk-budget-202103.pdf"
+          "url": "research-task/reports/12_基于宏观因子风险预算的股债资产配置策略_202103.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "data/framework-sources/macro-factor-risk-budget-202312.pdf"
+          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
         },
         {
           "label": "宏观因子投资体系下的风险动态配置系统",
@@ -3702,15 +3702,15 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "风险平价模型风险测度探讨：全天候资产配置框架之一",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202009081409149180_1.pdf?1599580500000.pdf="
+          "url": "research-task/reports/07_风险平价模型风险测度探讨_全天候资产配置框架之一.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2021）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202103021467277462_1.pdf?1614693426000.pdf="
+          "url": "research-task/reports/12_基于宏观因子风险预算的股债资产配置策略_202103.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202312041613222613_1.pdf?1701704684000.pdf="
+          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
         }
       ],
       "tags": [
@@ -4008,11 +4008,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "Black-Litterman + 风险平价 + CVaR 报告",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP201907041337236377_1.pdf"
+          "url": "research-task/reports/08_Black_Litterman_风险平价_CVaR.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202312041613222613_1.pdf?1701704684000.pdf="
+          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
         }
       ],
       "tags": [
@@ -6415,15 +6415,15 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2021）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202103021467277462_1.pdf?1614693426000.pdf="
+          "url": "research-task/reports/12_基于宏观因子风险预算的股债资产配置策略_202103.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202312041613222613_1.pdf?1701704684000.pdf="
+          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
         },
         {
           "label": "2024年第四季度大类资产配置（财信）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202410211640384696_1.pdf?1729527652000.pdf="
+          "url": "research-task/reports/26_2024年第四季度大类资产配置_财信.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -6592,11 +6592,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "大类资产配置月度报告：流动性合理充裕，超配债券",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP201908011342079258_1.pdf"
+          "url": "research-task/reports/14_大类资产配置月度报告_流动性合理充裕_超配债券.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202312041613222613_1.pdf?1701704684000.pdf="
+          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
         },
         {
           "label": "IMF 资产价格、货币政策与商业周期",
@@ -6604,7 +6604,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "2025年四季度大类资产配置策略报告",
-          "url": "https://pdf.dfcfw.com/pdf/H301_AP202509281673403160_1.pdf"
+          "url": "research-task/reports/25_2025年四季度大类资产配置策略报告.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -6786,11 +6786,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       "source_links": [
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2021）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202103021467277462_1.pdf?1614693426000.pdf="
+          "url": "research-task/reports/12_基于宏观因子风险预算的股债资产配置策略_202103.pdf"
         },
         {
           "label": "基于宏观因子风险预算的股债资产配置策略（2023）",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP202312041613222613_1.pdf?1701704684000.pdf="
+          "url": "research-task/reports/13_基于宏观因子风险预算的股债资产配置策略_202312.pdf"
         },
         {
           "label": "BIS 流动性与金融周期",
@@ -6798,7 +6798,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "宏观因子风险预算股债配置（2024年8月）",
-          "url": "https://pdf.dfcfw.com/pdf/H301_AP202408061639154222_1.pdf"
+          "url": "research-task/reports/20_基于宏观因子风险预算的股债资产配置策略_2024年8月.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -6990,11 +6990,11 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "大类资产配置月度报告：流动性合理充裕，超配债券",
-          "url": "https://pdf.dfcfw.com/pdf/H3_AP201908011342079258_1.pdf"
+          "url": "research-task/reports/14_大类资产配置月度报告_流动性合理充裕_超配债券.pdf"
         },
         {
           "label": "2025年四季度大类资产配置策略报告",
-          "url": "https://pdf.dfcfw.com/pdf/H301_AP202509281673403160_1.pdf"
+          "url": "research-task/reports/25_2025年四季度大类资产配置策略报告.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -7334,7 +7334,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "全球大类资产配置策略专题（2026年1月）",
-          "url": "https://pdf.dfcfw.com/pdf/H301_AP202601151817046107_1.pdf"
+          "url": "research-task/reports/21_全球大类资产配置策略专题_2026年1月.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -7501,7 +7501,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "2025年四季度大类资产配置策略报告",
-          "url": "https://pdf.dfcfw.com/pdf/H301_AP202509281673403160_1.pdf"
+          "url": "research-task/reports/25_2025年四季度大类资产配置策略报告.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -7691,7 +7691,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         },
         {
           "label": "2025年四季度大类资产配置策略报告",
-          "url": "https://pdf.dfcfw.com/pdf/H301_AP202509281673403160_1.pdf"
+          "url": "research-task/reports/25_2025年四季度大类资产配置策略报告.pdf"
         }
       ],
       "quarterly_sorting": [
@@ -10636,7 +10636,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-20 10:50:45",
+    "generated_at": "2026-04-20 11:06:11",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",
