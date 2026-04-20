@@ -5,6 +5,7 @@ const state = {
   activeScenarioId: null,
   activeAssetFocus: null,
   reportReviewMode: "all",
+  allocationWorkbench: null,
 };
 
 const FRAMEWORK_READING_ORDER = [
@@ -185,6 +186,989 @@ function toneClassFromSignal(tone) {
   if (tone === "pressured") return "is-pressured";
   if (tone === "watch") return "is-watch";
   return "is-neutral";
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function formatPercent(value) {
+  return `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
+}
+
+function formatCurrencyCny(value) {
+  return `¥${new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 0 }).format(Math.round(value || 0))}`;
+}
+
+function blackLittermanConfidenceLabel(value) {
+  const numeric = clampNumber(Number(value || 0), 2, 10);
+  if (numeric >= 8) return "高置信";
+  if (numeric >= 6) return "中高置信";
+  if (numeric >= 4) return "中性置信";
+  return "低置信";
+}
+
+function buildAllocationPieChartMarkup(result) {
+  const palette = ["#1a3358", "#0f7d6e", "#b5832a", "#cb6a46", "#6e7ff2", "#4c8b9f", "#8d5e8c", "#6b8e23", "#b94a6a"];
+  const sleevePalette = {
+    equity: "#1a3358",
+    bonds: "#0f7d6e",
+    alternatives: "#b5832a",
+    cash: "#cb6a46",
+  };
+  const items = (result?.results || []).filter((item) => Number(item.finalWeight || 0) > 0.01);
+  if (!items.length) return "";
+  const segments = items.map((item, index) => ({
+    ...item,
+    color: palette[index % palette.length],
+    value: clampNumber(Number(item.finalWeight || 0), 0, 100),
+  }));
+  const sleeveSegments = Object.entries(result?.sleeveMix || {})
+    .map(([key, value]) => ({
+      key,
+      label: result?.sleeveLabels?.[key] || key,
+      value: clampNumber(Number(value || 0), 0, 100),
+      color: sleevePalette[key] || "#4c8b9f",
+      amount: (Number(result?.capital || 0) * Number(value || 0)) / 100,
+    }))
+    .filter((item) => item.value > 0.01);
+  const renderScale = () => `
+    <div class="allocation-chart-scale">
+      <span>0%</span>
+      <span>25%</span>
+      <span>50%</span>
+      <span>75%</span>
+      <span>100%</span>
+    </div>
+  `;
+  return `
+    <section class="detail-section allocation-chart-card">
+      <div class="allocation-chart-head">
+        <div>
+          <h4>配置比例图</h4>
+          <p>左边看具体资产，右边看权益、债券、另类和现金四大类汇总，更适合汇报和快速比较。</p>
+        </div>
+      </div>
+      <div class="allocation-chart-grid">
+        <section class="allocation-chart-panel">
+          <div class="allocation-chart-panel-head">
+            <h5>具体资产</h5>
+            <span>${escapeHtml(`${segments.length} 项`)}</span>
+          </div>
+          ${renderScale()}
+          <div class="allocation-chart-bars">
+            ${segments
+              .map(
+                (item) => `
+                  <article class="allocation-chart-bar-row">
+                    <div class="allocation-chart-bar-top">
+                      <div class="allocation-chart-bar-label">
+                        <span class="allocation-chart-swatch" style="background:${item.color};"></span>
+                        <strong>${escapeHtml(item.asset_name)}</strong>
+                      </div>
+                      <div class="allocation-chart-bar-meta">
+                        <strong>${escapeHtml(formatPercent(item.finalWeight))}</strong>
+                        <span>${escapeHtml(formatCurrencyCny(item.amount))}</span>
+                      </div>
+                    </div>
+                    <div class="allocation-chart-track">
+                      <div class="allocation-chart-fill" style="width:${item.value.toFixed(2)}%; background:${item.color};"></div>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+        <section class="allocation-chart-panel">
+          <div class="allocation-chart-panel-head">
+            <h5>大类汇总</h5>
+            <span>${escapeHtml(`${sleeveSegments.length} 层`)}</span>
+          </div>
+          ${renderScale()}
+          <div class="allocation-chart-bars">
+            ${sleeveSegments
+              .map(
+                (item) => `
+                  <article class="allocation-chart-bar-row">
+                    <div class="allocation-chart-bar-top">
+                      <div class="allocation-chart-bar-label">
+                        <span class="allocation-chart-swatch" style="background:${item.color};"></span>
+                        <strong>${escapeHtml(item.label)}</strong>
+                      </div>
+                      <div class="allocation-chart-bar-meta">
+                        <strong>${escapeHtml(formatPercent(item.value))}</strong>
+                        <span>${escapeHtml(formatCurrencyCny(item.amount))}</span>
+                      </div>
+                    </div>
+                    <div class="allocation-chart-track">
+                      <div class="allocation-chart-fill" style="width:${item.value.toFixed(2)}%; background:${item.color};"></div>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+      </div>
+    </section>
+  `;
+}
+
+function parseWeightBand(text) {
+  const match = String(text || "").match(/(\d+(?:\.\d+)?)%\s*-\s*(\d+(?:\.\d+)?)%/);
+  if (!match) return { low: 0, high: 0, mid: 0 };
+  const low = Number(match[1]);
+  const high = Number(match[2]);
+  return {
+    low,
+    high,
+    mid: (low + high) / 2,
+  };
+}
+
+function getAllocationWorkbenchConfig() {
+  return state.data?.config?.allocation_workbench || null;
+}
+
+function getWorkbenchOption(options, value) {
+  return (options || []).find((item) => item.value === value) || (options || [])[0] || null;
+}
+
+function initializeAllocationWorkbenchState() {
+  if (state.allocationWorkbench) return;
+  const config = getAllocationWorkbenchConfig();
+  if (!config) return;
+  state.allocationWorkbench = JSON.parse(JSON.stringify(config.defaults || {}));
+}
+
+function getAllocationWorkbenchRecommendations() {
+  const config = getAllocationWorkbenchConfig();
+  const current = state.data?.current_view || {};
+  const assetMap = new Map((config?.asset_map || []).map((item) => [item.name, item]));
+  const calibrationMap = new Map((current.allocation_calibration?.ranking || []).map((item) => [item.asset, item]));
+  return (current.allocation_recommendations || [])
+    .filter((item) => assetMap.has(item.asset_name))
+    .map((item) => ({
+      ...item,
+      meta: assetMap.get(item.asset_name),
+      calibration: item.data_calibration || calibrationMap.get(item.asset_name) || null,
+      band: parseWeightBand(item.weight_band),
+    }));
+}
+
+function buildSleeveTargets(profile, years, macroStance) {
+  const sleeves = { ...(profile?.sleeves || {}) };
+  const horizonAdjustments =
+    years <= 2
+      ? { equity: -10, bonds: 6, alternatives: 0, cash: 4 }
+      : years <= 4
+        ? { equity: -4, bonds: 2, alternatives: 0, cash: 2 }
+        : years >= 10
+          ? { equity: 8, bonds: -5, alternatives: 0, cash: -3 }
+          : years >= 7
+            ? { equity: 4, bonds: -2, alternatives: 0, cash: -2 }
+            : { equity: 0, bonds: 0, alternatives: 0, cash: 0 };
+  const macroAdjustments = macroStance?.adjustments || {};
+  const keys = ["equity", "bonds", "alternatives", "cash"];
+  keys.forEach((key) => {
+    sleeves[key] = Math.max(0, Number(sleeves[key] || 0) + Number(horizonAdjustments[key] || 0) + Number(macroAdjustments[key] || 0));
+  });
+  const total = keys.reduce((sum, key) => sum + Number(sleeves[key] || 0), 0) || 1;
+  return Object.fromEntries(keys.map((key) => [key, (Number(sleeves[key] || 0) / total) * 100]));
+}
+
+function buildRecommendationScore(item, homeBias) {
+  const viewMultiplier = item.view === "超配" ? 1.16 : item.view === "低配" ? 0.82 : 1;
+  const toneMultiplier =
+    item.calibration?.tone === "supportive"
+      ? 1.08
+      : item.calibration?.tone === "watch"
+        ? 0.96
+        : item.calibration?.tone === "pressured"
+          ? 0.88
+          : 1;
+  const priorityMultiplier = item.calibration?.priority ? 1 + Math.max(0, 5 - Number(item.calibration.priority)) * 0.035 : 1;
+  const biasMultiplier = Number(homeBias?.score_overrides?.[item.asset_name] || 1);
+  return Math.max(0.1, item.band.mid * viewMultiplier * toneMultiplier * priorityMultiplier * biasMultiplier);
+}
+
+function buildReturnAdjustment(item, homeBias, macroStance) {
+  const viewAdjustment = item.view === "超配" ? 1 : item.view === "低配" ? -0.9 : 0.2;
+  const toneAdjustment =
+    item.calibration?.tone === "supportive"
+      ? 0.55
+      : item.calibration?.tone === "watch"
+        ? -0.15
+        : item.calibration?.tone === "pressured"
+          ? -0.55
+          : 0;
+  const priorityAdjustment = item.calibration?.priority ? Math.max(0, 5 - Number(item.calibration.priority)) * 0.12 : 0;
+  const sleeveAdjustment = Number(macroStance?.adjustments?.[item.meta?.sleeve] || 0) * 0.08;
+  const biasAdjustment = Number(homeBias?.score_overrides?.[item.asset_name] || 1) - 1;
+  return viewAdjustment + toneAdjustment + priorityAdjustment + sleeveAdjustment + biasAdjustment;
+}
+
+function estimateCorrelation(left, right) {
+  if (left.asset_name === right.asset_name) return 1;
+  const leftSleeve = left.meta?.sleeve;
+  const rightSleeve = right.meta?.sleeve;
+  if (leftSleeve === rightSleeve) {
+    if (leftSleeve === "equity") return 0.7;
+    if (leftSleeve === "bonds") return 0.58;
+    if (leftSleeve === "alternatives") return 0.46;
+    return 0.15;
+  }
+  const sleeveKey = [leftSleeve, rightSleeve].sort().join("-");
+  if (sleeveKey === "bonds-equity") return 0.18;
+  if (sleeveKey === "alternatives-equity") return 0.34;
+  if (sleeveKey === "alternatives-bonds") return 0.14;
+  if (sleeveKey === "cash-equity") return 0.04;
+  if (sleeveKey === "bonds-cash") return 0.08;
+  if (sleeveKey === "alternatives-cash") return 0.05;
+  return 0.12;
+}
+
+function projectWeightsToBoundedSimplex(values, lowerBounds, upperBounds, total = 1) {
+  const minTotal = lowerBounds.reduce((sum, value) => sum + value, 0);
+  const target = Math.max(0, total - minTotal);
+  const capacity = upperBounds.map((value, index) => Math.max(0, value - lowerBounds[index]));
+  const v = values.map((value, index) => value - lowerBounds[index]);
+  let low = Math.min(...v.map((value, index) => value - capacity[index])) - 1;
+  let high = Math.max(...v) + 1;
+  for (let i = 0; i < 80; i += 1) {
+    const mid = (low + high) / 2;
+    const sum = v.reduce((acc, value, index) => acc + clampNumber(value - mid, 0, capacity[index]), 0);
+    if (sum > target) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+  return v.map((value, index) => lowerBounds[index] + clampNumber(value - high, 0, capacity[index]));
+}
+
+function computePortfolioStats(items, weights, config) {
+  const assumptions = config.asset_assumptions || {};
+  const meanVarianceSettings = config.mean_variance_settings || {};
+  const expectedReturn = items.reduce((sum, item, index) => {
+    const assetAssumption = assumptions[item.asset_name] || {};
+    return sum + weights[index] * Number(item.expectedReturn || assetAssumption.expected_return || 0);
+  }, 0);
+  let variance = 0;
+  items.forEach((left, i) => {
+    items.forEach((right, j) => {
+      const sigmaLeft = Number((assumptions[left.asset_name] || {}).volatility || 0) / 100;
+      const sigmaRight = Number((assumptions[right.asset_name] || {}).volatility || 0) / 100;
+      variance += weights[i] * weights[j] * sigmaLeft * sigmaRight * estimateCorrelation(left, right);
+    });
+  });
+  const volatility = Math.sqrt(Math.max(variance, 0)) * 100;
+  const riskFreeRate = Number(meanVarianceSettings.risk_free_rate || 0);
+  return {
+    expectedReturn,
+    volatility,
+    sharpe: volatility > 0 ? (expectedReturn - riskFreeRate) / volatility : 0,
+  };
+}
+
+function buildCovarianceMatrix(items, assumptions) {
+  return items.map((left) =>
+    items.map((right) => {
+      const sigmaLeft = Number((assumptions[left.asset_name] || {}).volatility || left.volatility || 0) / 100;
+      const sigmaRight = Number((assumptions[right.asset_name] || {}).volatility || right.volatility || 0) / 100;
+      return sigmaLeft * sigmaRight * estimateCorrelation(left, right);
+    })
+  );
+}
+
+function multiplyMatrixVector(matrix, vector) {
+  return matrix.map((row) => row.reduce((sum, value, index) => sum + value * vector[index], 0));
+}
+
+function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
+}
+
+function multiplyMatrices(left, right) {
+  return left.map((row) =>
+    right[0].map((_, colIndex) => row.reduce((sum, value, index) => sum + value * right[index][colIndex], 0))
+  );
+}
+
+function invertMatrix(matrix) {
+  const size = matrix.length;
+  const augmented = matrix.map((row, i) => [
+    ...row.map((value) => Number(value)),
+    ...Array.from({ length: size }, (_, j) => (i === j ? 1 : 0)),
+  ]);
+  for (let col = 0; col < size; col += 1) {
+    let pivotRow = col;
+    for (let row = col + 1; row < size; row += 1) {
+      if (Math.abs(augmented[row][col]) > Math.abs(augmented[pivotRow][col])) {
+        pivotRow = row;
+      }
+    }
+    if (Math.abs(augmented[pivotRow][col]) < 1e-12) {
+      return null;
+    }
+    if (pivotRow !== col) {
+      [augmented[col], augmented[pivotRow]] = [augmented[pivotRow], augmented[col]];
+    }
+    const pivot = augmented[col][col];
+    for (let j = 0; j < 2 * size; j += 1) {
+      augmented[col][j] /= pivot;
+    }
+    for (let row = 0; row < size; row += 1) {
+      if (row === col) continue;
+      const factor = augmented[row][col];
+      for (let j = 0; j < 2 * size; j += 1) {
+        augmented[row][j] -= factor * augmented[col][j];
+      }
+    }
+  }
+  return augmented.map((row) => row.slice(size));
+}
+
+function getBlackLittermanViews(settings, recommendations, config) {
+  const maxViews = Number(config.black_litterman_settings?.max_views || 6);
+  const assetNames = new Set(recommendations.map((item) => item.asset_name));
+  return (settings.bl_views || [])
+    .slice(0, maxViews)
+    .map((view) => ({
+      type: view.type || "relative",
+      asset: view.asset,
+      relative_asset: view.relative_asset,
+      return_delta: Number(view.return_delta || 0),
+      confidence: clampNumber(Number(view.confidence || settings.view_confidence || 6), 2, 10),
+    }))
+    .filter((view) => assetNames.has(view.asset) && (view.type === "absolute" || assetNames.has(view.relative_asset)));
+}
+
+function buildBlackLittermanPosterior(items, priorWeights, settings, riskProfile, config) {
+  const assumptions = config.asset_assumptions || {};
+  const blSettings = config.black_litterman_settings || {};
+  const tau = Number(blSettings.tau || 0.08);
+  const covariance = buildCovarianceMatrix(items, assumptions);
+  const riskAversion =
+    riskProfile?.value === "conservative" ? 3.2 : riskProfile?.value === "growth" ? 2.3 : 2.7;
+  const pi = multiplyMatrixVector(covariance, priorWeights).map((value) => value * riskAversion);
+  const views = getBlackLittermanViews(settings, items, config);
+  if (!views.length) {
+    return { posteriorReturns: pi.map((value) => value * 100), viewsApplied: [] };
+  }
+
+  const assetIndex = new Map(items.map((item, index) => [item.asset_name, index]));
+  const P = views.map((view) => {
+    const row = Array.from({ length: items.length }, () => 0);
+    row[assetIndex.get(view.asset)] = 1;
+    if (view.type === "relative" && view.relative_asset) {
+      row[assetIndex.get(view.relative_asset)] = -1;
+    }
+    return row;
+  });
+  const Q = views.map((view) => view.return_delta / 100);
+
+  const tauSigma = covariance.map((row) => row.map((value) => value * tau));
+  const tauSigmaInv = invertMatrix(tauSigma);
+  if (!tauSigmaInv) {
+    return { posteriorReturns: pi.map((value) => value * 100), viewsApplied: views };
+  }
+  const PtauSigma = multiplyMatrices(P, tauSigma);
+  const PtauSigmaPt = multiplyMatrices(PtauSigma, transposeMatrix(P));
+  const omega = views.map((view, index) => {
+    const confidenceScale = (clampNumber(Number(settings.view_confidence || 6), 2, 10) / 10) * (view.confidence / 10);
+    const baseVariance = Math.max(PtauSigmaPt[index][index], 1e-6);
+    return baseVariance / Math.max(confidenceScale, 0.2);
+  });
+
+  const omegaInv = omega.map((value, i) =>
+    Array.from({ length: views.length }, (_, j) => (i === j ? 1 / value : 0))
+  );
+  const Pt = transposeMatrix(P);
+  const precision = multiplyMatrices(Pt, multiplyMatrices(omegaInv, P));
+  const posteriorPrecision = tauSigmaInv.map((row, i) => row.map((value, j) => value + precision[i][j]));
+  const posteriorPrecisionInv = invertMatrix(posteriorPrecision);
+  if (!posteriorPrecisionInv) {
+    return { posteriorReturns: pi.map((value) => value * 100), viewsApplied: views };
+  }
+  const leftTerm = multiplyMatrixVector(tauSigmaInv, pi);
+  const rightTerm = multiplyMatrixVector(multiplyMatrices(Pt, omegaInv), Q);
+  const posteriorMean = multiplyMatrixVector(
+    posteriorPrecisionInv,
+    leftTerm.map((value, index) => value + rightTerm[index])
+  );
+  return {
+    posteriorReturns: posteriorMean.map((value) => value * 100),
+    viewsApplied: views,
+  };
+}
+
+function computeRegimeBudgetWeights(recommendations, sleeveTargets) {
+  const sleeveOrder = ["equity", "bonds", "alternatives", "cash"];
+  const rawResults = [];
+  sleeveOrder.forEach((sleeve) => {
+    const sleeveItems = recommendations.filter((item) => item.meta?.sleeve === sleeve);
+    if (!sleeveItems.length) return;
+    const target = Number(sleeveTargets[sleeve] || 0);
+    const totalScore = sleeveItems.reduce((sum, item) => sum + item.score, 0) || 1;
+    sleeveItems.forEach((item) => {
+      rawResults.push({
+        ...item,
+        sleeve,
+        rawWeight: (target * item.score) / totalScore,
+      });
+    });
+  });
+  return rawResults;
+}
+
+function computeStrategicAnchorWeights(recommendations, sleeveTargets) {
+  const sleeveOrder = ["equity", "bonds", "alternatives", "cash"];
+  const rawResults = [];
+  sleeveOrder.forEach((sleeve) => {
+    const sleeveItems = recommendations.filter((item) => item.meta?.sleeve === sleeve);
+    if (!sleeveItems.length) return;
+    const target = Number(sleeveTargets[sleeve] || 0);
+    const totalMid = sleeveItems.reduce((sum, item) => sum + item.band.mid, 0) || 1;
+    sleeveItems.forEach((item) => {
+      rawResults.push({
+        ...item,
+        sleeve,
+        rawWeight: (target * item.band.mid) / totalMid,
+      });
+    });
+  });
+  return rawResults;
+}
+
+function buildTiltedWeights(baseWeights, lowerBounds, upperBounds, scores, strength, total = 1) {
+  const average = scores.reduce((sum, value) => sum + value, 0) / (scores.length || 1);
+  const centered = scores.map((value) => value - average);
+  const maxAbs = Math.max(...centered.map((value) => Math.abs(value)), 1);
+  const tiltScale = (Number(strength || 5) / 10) * 0.12;
+  const candidate = baseWeights.map((weight, index) => weight + (centered[index] / maxAbs) * tiltScale * Math.max(weight, 0.04));
+  return projectWeightsToBoundedSimplex(candidate, lowerBounds, upperBounds, total);
+}
+
+function computeRiskParityWeights(recommendations, sleeveTargets, homeBias, config) {
+  const assumptions = config.asset_assumptions || {};
+  const settings = config.risk_parity_settings || {};
+  const sleeveOrder = ["equity", "bonds", "alternatives"];
+  const cashTarget = Math.max(Number(settings.cash_floor || 0), Number(sleeveTargets.cash || 0));
+  const investableTarget = Math.max(0, 100 - cashTarget);
+
+  const sleeveWeights = {};
+  let sleeveNormalizer = 0;
+  sleeveOrder.forEach((sleeve) => {
+    const sleeveItems = recommendations.filter((item) => item.meta?.sleeve === sleeve);
+    if (!sleeveItems.length) return;
+    const averageVol =
+      sleeveItems.reduce((sum, item) => sum + Number((assumptions[item.asset_name] || {}).volatility || 12), 0) / sleeveItems.length;
+    const riskBudget = Math.max(4, Number(sleeveTargets[sleeve] || 0));
+    sleeveWeights[sleeve] = {
+      invVolBudget: riskBudget / Math.max(averageVol, 1),
+      averageVol,
+    };
+    sleeveNormalizer += sleeveWeights[sleeve].invVolBudget;
+  });
+
+  const rawResults = [];
+  sleeveOrder.forEach((sleeve) => {
+    const sleeveItems = recommendations.filter((item) => item.meta?.sleeve === sleeve);
+    if (!sleeveItems.length) return;
+    const sleeveCapital = sleeveNormalizer
+      ? (investableTarget * sleeveWeights[sleeve].invVolBudget) / sleeveNormalizer
+      : Number(sleeveTargets[sleeve] || 0);
+    const cappedSleeveCapital = Math.min(Number(settings.max_sleeve_weight || 60), sleeveCapital);
+    const sleeveScores = sleeveItems.map((item) => {
+      const vol = Number((assumptions[item.asset_name] || {}).volatility || 12);
+      const biasMultiplier = Number(homeBias?.score_overrides?.[item.asset_name] || 1);
+      return Math.max(0.1, (item.score * biasMultiplier) / Math.max(vol, 1));
+    });
+    const totalScore = sleeveScores.reduce((sum, value) => sum + value, 0) || 1;
+    sleeveItems.forEach((item, index) => {
+      rawResults.push({
+        ...item,
+        sleeve,
+        rawWeight: (cappedSleeveCapital * sleeveScores[index]) / totalScore,
+      });
+    });
+  });
+
+  const cashItems = recommendations.filter((item) => item.meta?.sleeve === "cash");
+  if (cashItems.length) {
+    const totalScore = cashItems.reduce((sum, item) => sum + item.score, 0) || 1;
+    cashItems.forEach((item) => {
+      rawResults.push({
+        ...item,
+        sleeve: "cash",
+        rawWeight: (cashTarget * item.score) / totalScore,
+      });
+    });
+  }
+
+  return rawResults;
+}
+
+function computeGTAAWeights(recommendations, sleeveTargets, settings, homeBias) {
+  const anchorItems = computeStrategicAnchorWeights(recommendations, sleeveTargets);
+  const items = recommendations.map((item) => {
+    const anchor = anchorItems.find((entry) => entry.asset_name === item.asset_name);
+    return {
+      ...item,
+      sleeve: item.meta?.sleeve,
+      anchorWeight: (anchor?.rawWeight || item.band.mid) / 100,
+    };
+  });
+  const weights = buildTiltedWeights(
+    items.map((item) => item.anchorWeight),
+    items.map((item) => item.band.low / 100),
+    items.map((item) => item.band.high / 100),
+    items.map((item) => item.score * Number(homeBias?.score_overrides?.[item.asset_name] || 1)),
+    settings.tactical_strength,
+    1
+  );
+  return items.map((item, index) => ({
+    ...item,
+    rawWeight: weights[index] * 100,
+    anchorWeight: item.anchorWeight * 100,
+  }));
+}
+
+function buildFactorBudgets(recommendations, macroStance, config) {
+  const exposures = config.asset_factor_exposures || {};
+  const factorNames = ["growth", "rate", "credit", "inflation", "safety"];
+  const budgets = Object.fromEntries(factorNames.map((name) => [name, 0]));
+  recommendations.forEach((item) => {
+    const assetExposure = exposures[item.asset_name] || {};
+    factorNames.forEach((name) => {
+      budgets[name] += item.score * Number(assetExposure[name] || 0);
+    });
+  });
+  const macroMultiplier =
+    macroStance?.value === "offensive"
+      ? { growth: 1.12, credit: 1.12, rate: 0.92, inflation: 1.04, safety: 0.9 }
+      : macroStance?.value === "defensive"
+        ? { growth: 0.9, credit: 0.92, rate: 1.1, inflation: 0.96, safety: 1.14 }
+        : { growth: 1, credit: 1, rate: 1, inflation: 1, safety: 1 };
+  factorNames.forEach((name) => {
+    budgets[name] *= Number(macroMultiplier[name] || 1);
+  });
+  return budgets;
+}
+
+function computeMacroFactorBudgetWeights(recommendations, sleeveTargets, settings, macroStance, homeBias, config) {
+  const exposures = config.asset_factor_exposures || {};
+  const factorBudgets = buildFactorBudgets(recommendations, macroStance, config);
+  const anchorItems = computeStrategicAnchorWeights(recommendations, sleeveTargets);
+  const items = recommendations.map((item) => {
+    const assetExposure = exposures[item.asset_name] || {};
+    const factorScore =
+      Number(assetExposure.growth || 0) * factorBudgets.growth +
+      Number(assetExposure.rate || 0) * factorBudgets.rate +
+      Number(assetExposure.credit || 0) * factorBudgets.credit +
+      Number(assetExposure.inflation || 0) * factorBudgets.inflation +
+      Number(assetExposure.safety || 0) * factorBudgets.safety;
+    const anchor = anchorItems.find((entry) => entry.asset_name === item.asset_name);
+    return {
+      ...item,
+      sleeve: item.meta?.sleeve,
+      factorScore: factorScore * Number(homeBias?.score_overrides?.[item.asset_name] || 1),
+      anchorWeight: (anchor?.rawWeight || item.band.mid) / 100,
+    };
+  });
+  const weights = buildTiltedWeights(
+    items.map((item) => item.anchorWeight),
+    items.map((item) => item.band.low / 100),
+    items.map((item) => item.band.high / 100),
+    items.map((item) => item.factorScore),
+    settings.factor_tilt_strength,
+    1
+  );
+  return items.map((item, index) => ({
+    ...item,
+    rawWeight: weights[index] * 100,
+    anchorWeight: item.anchorWeight * 100,
+    factorBudgets,
+  }));
+}
+
+function computeBlackLittermanWeights(recommendations, sleeveTargets, settings, homeBias, config) {
+  const priorItems = computeStrategicAnchorWeights(recommendations, sleeveTargets);
+  const priorMap = new Map(priorItems.map((item) => [item.asset_name, item.rawWeight / 100]));
+  const items = recommendations.map((item) => ({
+    ...item,
+    sleeve: item.meta?.sleeve,
+    anchorWeight: priorMap.get(item.asset_name) || item.band.mid / 100,
+    expectedReturn: Number((config.asset_assumptions?.[item.asset_name] || {}).expected_return || 0) + buildReturnAdjustment(item, homeBias, null),
+  }));
+  const posterior = buildBlackLittermanPosterior(items, items.map((item) => item.anchorWeight), settings, null, config);
+  const profilePenalty = 1;
+  const lambda = 2.8 * profilePenalty;
+  const anchorStrength = Number(config.mean_variance_settings?.anchor_strength || 4.2);
+  let weights = projectWeightsToBoundedSimplex(
+    items.map((item) => item.anchorWeight),
+    items.map((item) => item.band.low / 100),
+    items.map((item) => item.band.high / 100),
+    1
+  );
+  const posteriorItems = items.map((item, index) => ({
+    ...item,
+    expectedReturn: posterior.posteriorReturns[index],
+  }));
+  const covariance = buildCovarianceMatrix(posteriorItems, config.asset_assumptions || {});
+  const stepSize = 0.04;
+  for (let iter = 0; iter < 120; iter += 1) {
+    const gradients = posteriorItems.map((item, index) => {
+      let covarianceTerm = 0;
+      posteriorItems.forEach((_, j) => {
+        covarianceTerm += covariance[index][j] * weights[j];
+      });
+      return item.expectedReturn / 100 - lambda * covarianceTerm - anchorStrength * (weights[index] - item.anchorWeight);
+    });
+    const candidate = weights.map((weight, index) => weight + stepSize * gradients[index]);
+    weights = projectWeightsToBoundedSimplex(
+      candidate,
+      posteriorItems.map((item) => item.band.low / 100),
+      posteriorItems.map((item) => item.band.high / 100),
+      1
+    );
+  }
+  return items.map((item, index) => ({
+    ...item,
+    rawWeight: weights[index] * 100,
+    anchorWeight: item.anchorWeight * 100,
+    posteriorReturn: posterior.posteriorReturns[index],
+    viewsApplied: posterior.viewsApplied,
+  }));
+}
+
+function computeGoalsBasedWeights(recommendations, sleeveTargets, settings, macroStance) {
+  const safetyFloor = clampNumber(Number(settings.safety_floor_ratio || 35), 10, 70);
+  const safetyAssets = new Map([
+    ["中国货币/现金", 0.34],
+    ["中国利率债", 0.34],
+    ["中国信用债", 0.16],
+    ["海外债券", 0.1],
+    ["美元/外汇", 0.06],
+  ]);
+  const growthTarget = Math.max(0, 100 - safetyFloor);
+  const growthSleeves = {
+    equity: Math.max(0, Number(sleeveTargets.equity || 0)) * (growthTarget / 100),
+    bonds: Math.max(0, Number(sleeveTargets.bonds || 0) - safetyFloor * 0.7) * (growthTarget / 100),
+    alternatives: Math.max(0, Number(sleeveTargets.alternatives || 0)) * (growthTarget / 100),
+    cash: 0,
+  };
+  const growthItems = computeRegimeBudgetWeights(recommendations, growthSleeves);
+  const growthMap = new Map(growthItems.map((item) => [item.asset_name, item.rawWeight]));
+  return recommendations.map((item) => {
+    const safetyWeight = safetyFloor * Number(safetyAssets.get(item.asset_name) || 0);
+    return {
+      ...item,
+      sleeve: item.meta?.sleeve,
+      rawWeight: safetyWeight + Number(growthMap.get(item.asset_name) || 0),
+      safetyBucketWeight: safetyWeight,
+      goalStyle: macroStance?.label || "基准执行",
+    };
+  });
+}
+
+function buildScenarioBandPreference(item, macroStance) {
+  const base =
+    item.view === "超配"
+      ? 0.72
+      : item.view === "低配"
+        ? 0.28
+        : 0.5;
+  const toneAdjustment =
+    item.calibration?.tone === "supportive"
+      ? 0.08
+      : item.calibration?.tone === "watch"
+        ? -0.02
+        : item.calibration?.tone === "pressured"
+          ? -0.08
+          : 0;
+  const priorityAdjustment = item.calibration?.priority ? Math.max(0, 5 - Number(item.calibration.priority)) * 0.025 : 0;
+  const sleeve = item.meta?.sleeve;
+  const stanceAdjustment =
+    macroStance?.value === "offensive"
+      ? sleeve === "equity"
+        ? 0.06
+        : sleeve === "alternatives"
+          ? 0.03
+          : sleeve === "bonds"
+            ? -0.04
+            : -0.06
+      : macroStance?.value === "defensive"
+        ? sleeve === "equity"
+          ? -0.06
+          : sleeve === "alternatives"
+            ? -0.02
+            : sleeve === "bonds"
+              ? 0.05
+              : 0.06
+        : 0;
+  return clampNumber(base + toneAdjustment + priorityAdjustment + stanceAdjustment, 0.08, 0.92);
+}
+
+function computeScenarioBandWeights(recommendations, sleeveTargets, macroStance, homeBias) {
+  const anchorItems = computeStrategicAnchorWeights(recommendations, sleeveTargets);
+  const anchorMap = new Map(anchorItems.map((item) => [item.asset_name, item.rawWeight / 100]));
+  const scenarioShare = macroStance?.value === "offensive" ? 0.72 : macroStance?.value === "defensive" ? 0.58 : 0.65;
+  const items = recommendations.map((item) => {
+    const scenarioPreference = buildScenarioBandPreference(item, macroStance);
+    const bandTarget = item.band.low + (item.band.high - item.band.low) * scenarioPreference;
+    return {
+      ...item,
+      sleeve: item.meta?.sleeve,
+      anchorWeight: anchorMap.get(item.asset_name) || item.band.mid / 100,
+      scenarioPreference,
+      bandTarget,
+      desiredWeight: (bandTarget / 100) * Number(homeBias?.score_overrides?.[item.asset_name] || 1),
+    };
+  });
+  const weights = projectWeightsToBoundedSimplex(
+    items.map((item) => item.anchorWeight * (1 - scenarioShare) + item.desiredWeight * scenarioShare),
+    items.map((item) => item.band.low / 100),
+    items.map((item) => item.band.high / 100),
+    1
+  );
+  return items.map((item, index) => ({
+    ...item,
+    rawWeight: weights[index] * 100,
+    anchorWeight: item.anchorWeight * 100,
+  }));
+}
+
+function computeCoreSatelliteWeights(recommendations, sleeveTargets, settings, riskProfile, macroStance, homeBias) {
+  const overlayItems = computeScenarioBandWeights(recommendations, sleeveTargets, macroStance, homeBias);
+  const years = clampNumber(Number(settings.horizon_years || 5), 1, 15);
+  const baseCoreShare =
+    riskProfile?.value === "conservative" ? 0.82 : riskProfile?.value === "growth" ? 0.64 : 0.74;
+  const horizonAdjustment =
+    years <= 2
+      ? 0.06
+      : years <= 4
+        ? 0.03
+        : years >= 10
+          ? -0.05
+          : years >= 7
+            ? -0.03
+            : 0;
+  const stanceAdjustment = macroStance?.value === "defensive" ? 0.04 : macroStance?.value === "offensive" ? -0.04 : 0;
+  const coreShare = clampNumber(baseCoreShare + horizonAdjustment + stanceAdjustment, 0.55, 0.9);
+  const satelliteShare = 1 - coreShare;
+  const weights = projectWeightsToBoundedSimplex(
+    overlayItems.map((item) => (item.anchorWeight / 100) * coreShare + (item.rawWeight / 100) * satelliteShare),
+    overlayItems.map((item) => item.band.low / 100),
+    overlayItems.map((item) => item.band.high / 100),
+    1
+  );
+  return overlayItems.map((item, index) => ({
+    ...item,
+    rawWeight: weights[index] * 100,
+    coreShare: coreShare * 100,
+    satelliteShare: satelliteShare * 100,
+    satelliteWeight: (item.rawWeight / 100) * satelliteShare * 100,
+  }));
+}
+
+function computeMeanVarianceWeights(recommendations, sleeveTargets, settings, riskProfile, macroStance, homeBias, config) {
+  const assumptions = config.asset_assumptions || {};
+  const meanVarianceSettings = config.mean_variance_settings || {};
+  const total = recommendations.length;
+  if (!total) return [];
+  const anchorItems = computeRegimeBudgetWeights(recommendations, sleeveTargets);
+  const anchorMap = new Map(anchorItems.map((item) => [item.asset_name, item.rawWeight / 100]));
+  const items = recommendations.map((item) => {
+    const assumption = assumptions[item.asset_name] || {};
+    return {
+      ...item,
+      expectedReturn: Number(assumption.expected_return || 0) + buildReturnAdjustment(item, homeBias, macroStance),
+      volatility: Number(assumption.volatility || 12),
+      anchorWeight: anchorMap.get(item.asset_name) || item.band.mid / 100,
+    };
+  });
+  let weights = projectWeightsToBoundedSimplex(
+    items.map((item) => item.anchorWeight),
+    items.map((item) => item.band.low / 100),
+    items.map((item) => item.band.high / 100),
+    1
+  );
+  const profilePenalty =
+    riskProfile?.value === "conservative" ? 1.35 : riskProfile?.value === "growth" ? 0.82 : 1;
+  const lambda = clampNumber(Number(settings.risk_aversion || config.defaults?.risk_aversion || 6), 2, 10) * profilePenalty;
+  const anchorStrength = Number(meanVarianceSettings.anchor_strength || 4.2);
+  const stepSize = 0.045;
+  for (let iter = 0; iter < 120; iter += 1) {
+    const gradients = items.map((item, index) => {
+      let covarianceTerm = 0;
+      items.forEach((other, j) => {
+        const sigmaLeft = item.volatility / 100;
+        const sigmaRight = other.volatility / 100;
+        covarianceTerm += estimateCorrelation(item, other) * sigmaLeft * sigmaRight * weights[j];
+      });
+      return item.expectedReturn / 100 - lambda * covarianceTerm - anchorStrength * (weights[index] - item.anchorWeight);
+    });
+    const candidate = weights.map((weight, index) => weight + stepSize * gradients[index]);
+    weights = projectWeightsToBoundedSimplex(
+      candidate,
+      items.map((item) => item.band.low / 100),
+      items.map((item) => item.band.high / 100),
+      1
+    );
+  }
+  const stats = computePortfolioStats(items, weights, config);
+  return items.map((item, index) => ({
+    ...item,
+    sleeve: item.meta?.sleeve,
+    rawWeight: weights[index] * 100,
+    anchorWeight: item.anchorWeight * 100,
+    portfolioStats: stats,
+  }));
+}
+
+function computeAllocationWorkbenchResult() {
+  initializeAllocationWorkbenchState();
+  const config = getAllocationWorkbenchConfig();
+  const current = state.data?.current_view || {};
+  if (!config || !state.allocationWorkbench) return null;
+  const settings = state.allocationWorkbench;
+  const riskProfile = getWorkbenchOption(config.risk_profiles, settings.risk_profile);
+  const macroStance = getWorkbenchOption(config.macro_stances, settings.macro_stance);
+  const homeBias = getWorkbenchOption(config.home_biases, settings.home_bias);
+  const allocationModel = getWorkbenchOption(config.allocation_models, settings.allocation_model);
+  const years = clampNumber(Number(settings.horizon_years || config.defaults.horizon_years || 5), 1, 15);
+  const capital = clampNumber(Number(settings.capital || config.defaults.capital || 300000), 50000, 50000000);
+  const rebalanceThreshold = clampNumber(Number(settings.rebalance_threshold || config.defaults.rebalance_threshold || 5), 3, 10);
+  const sleeveTargets = buildSleeveTargets(riskProfile, years, macroStance);
+  const recommendations = getAllocationWorkbenchRecommendations().map((item) => ({
+    ...item,
+    score: buildRecommendationScore(item, homeBias),
+  }));
+  const sleeveOrder = ["equity", "bonds", "alternatives", "cash"];
+  const rawResults =
+    allocationModel?.value === "mean_variance"
+      ? computeMeanVarianceWeights(recommendations, sleeveTargets, settings, riskProfile, macroStance, homeBias, config)
+      : allocationModel?.value === "risk_parity"
+        ? computeRiskParityWeights(recommendations, sleeveTargets, homeBias, config)
+        : allocationModel?.value === "gtaa"
+          ? computeGTAAWeights(recommendations, sleeveTargets, settings, homeBias)
+          : allocationModel?.value === "macro_factor_budget"
+            ? computeMacroFactorBudgetWeights(recommendations, sleeveTargets, settings, macroStance, homeBias, config)
+            : allocationModel?.value === "black_litterman"
+              ? computeBlackLittermanWeights(recommendations, sleeveTargets, settings, homeBias, config)
+              : allocationModel?.value === "goals_based"
+                ? computeGoalsBasedWeights(recommendations, sleeveTargets, settings, macroStance)
+                : allocationModel?.value === "core_satellite"
+                  ? computeCoreSatelliteWeights(recommendations, sleeveTargets, settings, riskProfile, macroStance, homeBias)
+                  : allocationModel?.value === "scenario_band"
+                    ? computeScenarioBandWeights(recommendations, sleeveTargets, macroStance, homeBias)
+        : computeRegimeBudgetWeights(recommendations, sleeveTargets);
+
+  const roundLot = Number(config.round_lot || 100);
+  const minimumTicket = Number(config.minimum_ticket || 5000);
+  const sortedResults = rawResults.sort((a, b) => b.rawWeight - a.rawWeight);
+  let roundedTotal = 0;
+  sortedResults.forEach((item) => {
+    item.amount = Math.round((capital * item.rawWeight) / 100 / roundLot) * roundLot;
+    roundedTotal += item.amount;
+  });
+  if (sortedResults.length) {
+    sortedResults[0].amount += capital - roundedTotal;
+  }
+
+  sortedResults.forEach((item) => {
+    item.finalWeight = capital > 0 ? (item.amount / capital) * 100 : item.rawWeight;
+    item.isBelowMinimum = item.amount > 0 && item.amount < minimumTicket;
+    item.fitStatus =
+      item.finalWeight < item.band.low
+        ? "低于参考下沿"
+        : item.finalWeight > item.band.high
+          ? "高于参考上沿"
+          : "处于参考区间";
+  });
+
+  const sleeveMix = Object.fromEntries(
+    sleeveOrder.map((sleeve) => [
+      sleeve,
+      sortedResults.filter((item) => item.sleeve === sleeve).reduce((sum, item) => sum + item.finalWeight, 0),
+    ])
+  );
+
+  const warnings = [];
+  const modelMeta = rawResults.length
+    ? {
+        coreShare: rawResults[0].coreShare ?? null,
+        satelliteShare: rawResults[0].satelliteShare ?? null,
+      }
+    : null;
+  if (sortedResults.some((item) => item.isBelowMinimum)) {
+    warnings.push(`当前金额下，部分头寸低于 ${formatCurrencyCny(minimumTicket)} 的最低建议建仓额。`);
+  }
+  if (years <= 2) {
+    warnings.push("期限较短，系统已主动下调权益预算并抬升债券和现金。");
+  }
+  if (macroStance?.value === "offensive") {
+    warnings.push("你选择了进取执行，组合会更接近当前宏观判断的上沿表达。");
+  }
+  if (homeBias?.value === "hedged") {
+    warnings.push("你选择了海外对冲，系统会提高海外债券和外汇对冲的相对权重。");
+  }
+  if (allocationModel?.value === "mean_variance") {
+    warnings.push(`当前使用的是约束均值-方差模式，风险厌恶系数为 ${Number(settings.risk_aversion || 6)}。`);
+  }
+  if (allocationModel?.value === "risk_parity") {
+    warnings.push("当前使用风险平价 / 全天候模式，低波动资产会获得更高资金权重，高波动资产更多通过较小仓位贡献风险预算。");
+  }
+  if (allocationModel?.value === "gtaa") {
+    warnings.push(`当前使用 GTAA 模式，战术强度为 ${Number(settings.tactical_strength || 6)}。这更适合中期轮动，不适合当作永久战略中枢。`);
+  }
+  if (allocationModel?.value === "macro_factor_budget") {
+    warnings.push(`当前使用宏观因子风险预算模式，因子倾斜强度为 ${Number(settings.factor_tilt_strength || 6)}。`);
+  }
+  if (allocationModel?.value === "black_litterman") {
+    warnings.push(`当前使用 Black-Litterman 模式，主观观点置信度为 ${Number(settings.view_confidence || 6)}。`);
+  }
+  if (allocationModel?.value === "goals_based") {
+    warnings.push(`当前使用目标导向 / 负债约束模式，安全桶比例为 ${Number(settings.safety_floor_ratio || 35)}%。`);
+  }
+  if (allocationModel?.value === "core_satellite") {
+    warnings.push(
+      `当前使用核心-卫星模式，核心仓约 ${formatPercent(modelMeta?.coreShare || 0)}，卫星仓约 ${formatPercent(
+        modelMeta?.satelliteShare || 0
+      )}。`
+    );
+  }
+  if (allocationModel?.value === "scenario_band") {
+    warnings.push("当前使用情景映射 + 区间权重模式，权重更贴近超配 / 中性 / 低配的区间表达，而不是优化器极值解。");
+  }
+
+  const stats =
+    allocationModel?.value !== "regime_budget"
+      ? computePortfolioStats(sortedResults, sortedResults.map((item) => item.finalWeight / 100), config)
+      : null;
+
+  return {
+    capital,
+    years,
+    allocationModel,
+    riskProfile,
+    macroStance,
+    homeBias,
+    rebalanceThreshold,
+    sleeveMix,
+    warnings,
+    results: sortedResults,
+    stats,
+    modelMeta,
+    currentMacroState: current.current_macro_state || "",
+    macroSummary: current.macro_summary || "",
+    calibrationSummary: current.allocation_calibration?.summary || "",
+    confidence: current.confidence_level || "",
+    sleeveLabels: config.sleeve_labels || {},
+  };
 }
 
 function buildSparklineSvg(values) {
@@ -2459,6 +3443,513 @@ function renderResearchMapIntro(containerId, intro) {
   bindPathNodes(`#${containerId}`);
 }
 
+function renderAllocationWorkbench() {
+  const config = getAllocationWorkbenchConfig();
+  const result = computeAllocationWorkbenchResult();
+  if (!config || !result || !state.allocationWorkbench) return "";
+  const settings = state.allocationWorkbench;
+  const assetOptions = (config.asset_map || []).map((item) => item.name);
+  const renderAssetOptions = (selected) =>
+    assetOptions
+      .map((name) => `<option value="${escapeHtml(name)}"${selected === name ? " selected" : ""}>${escapeHtml(name)}</option>`)
+      .join("");
+  const renderChoiceGroup = (field, options, variant = "") => `
+    <div class="allocation-choice-group${variant ? ` is-${escapeHtml(variant)}` : ""}">
+      ${(options || [])
+        .map(
+          (option) => `
+            <button
+              type="button"
+              class="allocation-choice-button${variant ? ` is-${escapeHtml(variant)}` : ""}${settings[field] === option.value ? " is-active" : ""}"
+              data-allocation-choice="${escapeHtml(field)}"
+              data-allocation-value="${escapeHtml(option.value)}"
+            >
+              <span>${escapeHtml(option.label)}</span>
+              <small>${escapeHtml(option.note || "")}</small>
+            </button>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+  return `
+    <article class="method-card allocation-workbench-card" id="allocation-workbench-card">
+      <div class="method-system-kicker">Allocation Engine</div>
+      <h3>${escapeHtml(config.title)}</h3>
+      <p>${escapeHtml(config.summary)}</p>
+      <div class="allocation-workbench-layout">
+        <section class="allocation-control-panel">
+          <div class="detail-section">
+            <h4>配置模型</h4>
+            ${renderChoiceGroup("allocation_model", config.allocation_models, "model")}
+          </div>
+
+          <div class="allocation-control-grid">
+            <label class="allocation-control-card">
+              <span>组合规模</span>
+              <input
+                type="number"
+                min="50000"
+                step="10000"
+                value="${escapeHtml(String(settings.capital))}"
+                data-allocation-input="capital"
+              />
+              <small>默认 30 万，可按你的真实资金规模调整。</small>
+            </label>
+            <label class="allocation-control-card">
+              <span>投资期限</span>
+              <input
+                type="range"
+                min="1"
+                max="15"
+                step="1"
+                value="${escapeHtml(String(settings.horizon_years))}"
+                data-allocation-range="horizon_years"
+              />
+              <strong>${escapeHtml(`${settings.horizon_years} 年`)}</strong>
+            </label>
+            <label class="allocation-control-card">
+              <span>再平衡阈值</span>
+              <input
+                type="range"
+                min="3"
+                max="10"
+                step="1"
+                value="${escapeHtml(String(settings.rebalance_threshold))}"
+                data-allocation-range="rebalance_threshold"
+              />
+              <strong>${escapeHtml(`偏离 ${settings.rebalance_threshold}% 触发`)}</strong>
+            </label>
+            ${
+              settings.allocation_model === "mean_variance"
+                ? `
+                  <label class="allocation-control-card">
+                    <span>风险厌恶系数</span>
+                    <input
+                      type="range"
+                      min="2"
+                      max="10"
+                      step="1"
+                      value="${escapeHtml(String(settings.risk_aversion))}"
+                      data-allocation-range="risk_aversion"
+                    />
+                    <strong>${escapeHtml(`${settings.risk_aversion}`)}</strong>
+                    <small>数值越高，均值-方差模型越偏向压低波动和回撤。</small>
+                  </label>
+                `
+                : settings.allocation_model === "gtaa"
+                  ? `
+                    <label class="allocation-control-card">
+                      <span>战术强度</span>
+                      <input
+                        type="range"
+                        min="2"
+                        max="10"
+                        step="1"
+                        value="${escapeHtml(String(settings.tactical_strength))}"
+                        data-allocation-range="tactical_strength"
+                      />
+                      <strong>${escapeHtml(`${settings.tactical_strength}`)}</strong>
+                      <small>数值越高，GTAA 对当前相对强弱和趋势信号的响应越明显。</small>
+                    </label>
+                  `
+                  : settings.allocation_model === "macro_factor_budget"
+                    ? `
+                      <label class="allocation-control-card">
+                        <span>因子倾斜强度</span>
+                        <input
+                          type="range"
+                          min="2"
+                          max="10"
+                          step="1"
+                          value="${escapeHtml(String(settings.factor_tilt_strength))}"
+                          data-allocation-range="factor_tilt_strength"
+                        />
+                        <strong>${escapeHtml(`${settings.factor_tilt_strength}`)}</strong>
+                        <small>数值越高，组合对增长、利率、信用和通胀因子预算的偏离越大。</small>
+                      </label>
+                    `
+                      : settings.allocation_model === "black_litterman"
+                        ? `
+                          <label class="allocation-control-card">
+                            <span>全局观点强度</span>
+                            <input
+                              type="range"
+                              min="2"
+                            max="10"
+                            step="1"
+                            value="${escapeHtml(String(settings.view_confidence))}"
+                            data-allocation-range="view_confidence"
+                          />
+                          <strong>${escapeHtml(`${settings.view_confidence}`)}</strong>
+                          <small>数值越高，当前宏观观点对战略锚的偏离幅度越大。</small>
+                        </label>
+                      `
+                      : settings.allocation_model === "goals_based"
+                        ? `
+                          <label class="allocation-control-card">
+                            <span>安全桶比例</span>
+                            <input
+                              type="range"
+                              min="10"
+                              max="70"
+                              step="5"
+                              value="${escapeHtml(String(settings.safety_floor_ratio))}"
+                              data-allocation-range="safety_floor_ratio"
+                            />
+                            <strong>${escapeHtml(`${settings.safety_floor_ratio}%`)}</strong>
+                            <small>先划入现金和债券的安全桶比例，剩余资金进入增长桶。</small>
+                          </label>
+                        `
+                        : settings.allocation_model === "core_satellite"
+                          ? `
+                            <label class="allocation-control-card">
+                              <span>执行方式</span>
+                              <strong>核心仓 + 卫星仓</strong>
+                              <small>核心仓承接长期中枢，卫星仓跟随当前宏观观点，最终按再平衡阈值控制偏离。</small>
+                            </label>
+                          `
+                          : settings.allocation_model === "scenario_band"
+                            ? `
+                              <label class="allocation-control-card">
+                                <span>输出方式</span>
+                                <strong>区间权重映射</strong>
+                                <small>直接把超配、中性、低配映射到参考区间，更适合快速形成投委会讨论口径。</small>
+                              </label>
+                            `
+                : ""
+            }
+          </div>
+
+          ${
+            settings.allocation_model === "black_litterman"
+              ? `
+                <div class="detail-section">
+                  <div class="allocation-views-head">
+                    <div>
+                      <h4>观点输入层</h4>
+                      <p>只输入你真正有把握的观点。未被观点覆盖的资产会更多沿用战略锚，不需要对每个资产都手工写观点。</p>
+                    </div>
+                    <button type="button" class="allocation-inline-button" data-bl-view-add>新增观点</button>
+                  </div>
+                  <div class="allocation-view-list">
+                    ${(settings.bl_views || [])
+                      .map(
+                        (view, index) => `
+                          <article class="allocation-view-card">
+                            <div class="allocation-view-grid">
+                              <label>
+                                <span>类型</span>
+                                <select data-bl-view-field="type" data-bl-view-index="${index}">
+                                  <option value="relative"${view.type === "relative" ? " selected" : ""}>相对观点</option>
+                                  <option value="absolute"${view.type === "absolute" ? " selected" : ""}>绝对观点</option>
+                                </select>
+                              </label>
+                              <label>
+                                <span>资产 A</span>
+                                <select data-bl-view-field="asset" data-bl-view-index="${index}">
+                                  ${renderAssetOptions(view.asset)}
+                                </select>
+                              </label>
+                              ${
+                                view.type === "relative"
+                                  ? `
+                                    <label>
+                                      <span>相对资产 B</span>
+                                      <select data-bl-view-field="relative_asset" data-bl-view-index="${index}">
+                                        ${renderAssetOptions(view.relative_asset)}
+                                      </select>
+                                    </label>
+                                  `
+                                  : `
+                                    <label>
+                                      <span>目标资产</span>
+                                      <div class="allocation-view-static">绝对收益观点</div>
+                                    </label>
+                                  `
+                              }
+                              <label>
+                                <span>${view.type === "relative" ? "超额收益预期" : "目标年化收益"}</span>
+                                <input type="number" step="0.1" value="${escapeHtml(String(view.return_delta ?? 0))}" data-bl-view-field="return_delta" data-bl-view-index="${index}" />
+                              </label>
+                              <label>
+                                <span>置信度</span>
+                                <input type="range" min="2" max="10" step="1" value="${escapeHtml(String(view.confidence ?? settings.view_confidence ?? 6))}" data-bl-view-field="confidence" data-bl-view-index="${index}" />
+                                <strong>${escapeHtml(String(view.confidence ?? settings.view_confidence ?? 6))}</strong>
+                              </label>
+                            </div>
+                            <div class="allocation-view-foot">
+                              <div class="allocation-view-note">
+                                ${
+                                  view.type === "relative"
+                                    ? escapeHtml(
+                                        `${view.asset || "资产 A"} 相对 ${view.relative_asset || "资产 B"} 未来年化多 ${view.return_delta ?? 0}% · 置信度 ${view.confidence ?? settings.view_confidence ?? 6}/10 · ${blackLittermanConfidenceLabel(view.confidence ?? settings.view_confidence ?? 6)}`
+                                      )
+                                    : escapeHtml(
+                                        `${view.asset || "资产"} 的目标年化收益为 ${view.return_delta ?? 0}% · 置信度 ${view.confidence ?? settings.view_confidence ?? 6}/10 · ${blackLittermanConfidenceLabel(view.confidence ?? settings.view_confidence ?? 6)}`
+                                      )
+                                }
+                              </div>
+                              <button type="button" class="allocation-inline-button is-danger" data-bl-view-remove="${index}">删除</button>
+                            </div>
+                          </article>
+                        `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+              : ""
+          }
+
+          <div class="detail-section">
+            <h4>风险偏好</h4>
+            ${renderChoiceGroup("risk_profile", config.risk_profiles)}
+          </div>
+
+          <div class="detail-section">
+            <h4>宏观执行倾向</h4>
+            ${renderChoiceGroup("macro_stance", config.macro_stances)}
+          </div>
+
+          <div class="detail-section">
+            <h4>境内 / 海外偏好</h4>
+            ${renderChoiceGroup("home_bias", config.home_biases)}
+          </div>
+        </section>
+
+        <section class="allocation-output-panel">
+          <div class="allocation-output-head">
+            <div>
+              <div class="allocation-output-kicker">Current Macro Anchor</div>
+              <h4>${escapeHtml(result.currentMacroState || "当前宏观判断")}</h4>
+              <p>${escapeHtml(result.macroSummary || result.calibrationSummary || "")}</p>
+            </div>
+            <div class="allocation-output-meta">
+              <span class="meta-pill">${escapeHtml(result.allocationModel?.label || "")}</span>
+              <span class="meta-pill">${escapeHtml(result.riskProfile?.label || "")}</span>
+              <span class="meta-pill">${escapeHtml(result.macroStance?.label || "")}</span>
+              <span class="meta-pill">${escapeHtml(result.homeBias?.label || "")}</span>
+              ${result.confidence ? `<span class="meta-pill">${escapeHtml(result.confidence)}</span>` : ""}
+            </div>
+          </div>
+
+          <div class="allocation-sleeve-grid">
+            ${Object.entries(result.sleeveMix)
+              .map(
+                ([key, value]) => `
+                  <article class="allocation-sleeve-card">
+                    <span>${escapeHtml(result.sleeveLabels[key] || key)}</span>
+                    <strong>${escapeHtml(formatPercent(value))}</strong>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+
+          <div class="allocation-output-summary">
+            <div class="allocation-output-summary-item">
+              <span>组合规模</span>
+              <strong>${escapeHtml(formatCurrencyCny(result.capital))}</strong>
+            </div>
+            <div class="allocation-output-summary-item">
+              <span>期限</span>
+              <strong>${escapeHtml(`${result.years} 年`)}</strong>
+            </div>
+            <div class="allocation-output-summary-item">
+              <span>再平衡</span>
+              <strong>${escapeHtml(`季度检查 + ${result.rebalanceThreshold}% 阈值`)}</strong>
+            </div>
+            ${
+              result.stats
+                ? `
+                  <div class="allocation-output-summary-item">
+                    <span>预期收益</span>
+                    <strong>${escapeHtml(formatPercent(result.stats.expectedReturn))}</strong>
+                  </div>
+                  <div class="allocation-output-summary-item">
+                    <span>预期波动</span>
+                    <strong>${escapeHtml(formatPercent(result.stats.volatility))}</strong>
+                  </div>
+                  <div class="allocation-output-summary-item">
+                    <span>夏普近似</span>
+                    <strong>${escapeHtml(Number(result.stats.sharpe || 0).toFixed(2))}</strong>
+                  </div>
+                `
+                : ""
+            }
+          </div>
+
+          ${buildAllocationPieChartMarkup(result)}
+
+          <div class="allocation-result-table">
+            <div class="allocation-result-table-head">
+              <span>资产</span>
+              <span>权重</span>
+              <span>金额</span>
+              <span>参考区间</span>
+            </div>
+            ${result.results
+              .map(
+                (item) => `
+                  <article class="allocation-result-row">
+                    <div class="allocation-result-main">
+                      <div class="allocation-result-name">${escapeHtml(item.asset_name)}</div>
+                      <div class="allocation-result-note">${escapeHtml(item.reason)}</div>
+                      ${
+                        item.calibration?.reason
+                          ? `<div class="allocation-result-calibration">${escapeHtml(item.calibration.reason)}</div>`
+                          : ""
+                      }
+                    </div>
+                    <div class="allocation-result-weight">${escapeHtml(formatPercent(item.finalWeight))}</div>
+                    <div class="allocation-result-amount">${escapeHtml(formatCurrencyCny(item.amount))}</div>
+                    <div class="allocation-result-band">
+                      <strong>${escapeHtml(item.weight_band)}</strong>
+                      <span>${escapeHtml(item.fitStatus)}</span>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+
+          <div class="allocation-output-foot-grid">
+            <section class="detail-section allocation-output-foot-card">
+              <h4>系统解释</h4>
+              <ul>
+                <li>${escapeHtml(`长期锚采用 ${result.riskProfile?.label || ""} 档配置，再用 ${result.macroStance?.label || ""} 做阶段性倾斜。`)}</li>
+                <li>${escapeHtml(`境内 / 海外偏好当前选择为 ${result.homeBias?.label || ""}，会改变境内外资产的相对得分。`)}</li>
+                <li>${escapeHtml(
+                  result.allocationModel?.value === "mean_variance"
+                    ? "当前使用约束均值-方差：在参考区间内，综合预期收益、波动、相关性和战略锚做优化。"
+                    : result.allocationModel?.value === "risk_parity"
+                      ? "当前使用风险平价 / 全天候：先按风险预算分配三大风险资产层，再在层内按当前宏观判断和波动约束拆分。"
+                      : result.allocationModel?.value === "gtaa"
+                        ? "当前使用 GTAA：先用战略锚确定基准，再按跨资产相对强弱做战术倾斜。"
+                        : result.allocationModel?.value === "macro_factor_budget"
+                          ? "当前使用宏观因子风险预算：先做增长、利率、信用、通胀和安全因子预算，再映射回资产。"
+                          : result.allocationModel?.value === "black_litterman"
+                            ? "当前使用 Black-Litterman：先用战略锚做先验，再用当前宏观观点形成后验权重。"
+                            : result.allocationModel?.value === "goals_based"
+                              ? "当前使用目标导向 / 负债约束：先划安全桶，再把剩余资金按增长目标配置。"
+                              : result.allocationModel?.value === "core_satellite"
+                                ? `当前使用核心-卫星 + 阈值再平衡：核心仓约 ${formatPercent(
+                                    result.modelMeta?.coreShare || 0
+                                  )} 承接长期中枢，卫星仓约 ${formatPercent(
+                                    result.modelMeta?.satelliteShare || 0
+                                  )} 表达当前宏观倾向。`
+                                : result.allocationModel?.value === "scenario_band"
+                                  ? "当前使用情景映射 + 区间权重：先把超配、中性、低配映射到参考区间，再按当前宏观倾向在区间内选位。"
+                      : "当前使用系统预算：先按风险档位确定大类资产分层，再顺着当前宏观判断和优先级做分配。"
+                )}</li>
+              </ul>
+            </section>
+            <section class="detail-section allocation-output-foot-card">
+              <h4>再平衡与提醒</h4>
+              <ul>
+                <li>${escapeHtml(`默认采用季度检查 + 偏离 ${result.rebalanceThreshold}% 触发。`)}</li>
+                ${
+                  result.warnings.length
+                    ? result.warnings.map((line) => `<li>${escapeHtml(line)}</li>`).join("")
+                    : "<li>当前参数下没有触发额外警示，适合按系统结果做首版落地。</li>"
+                }
+              </ul>
+            </section>
+          </div>
+        </section>
+      </div>
+    </article>
+  `;
+}
+
+function bindAllocationWorkbenchControls() {
+  const root = document.getElementById("allocation-workbench-card");
+  if (!root) return;
+  root.querySelectorAll("[data-allocation-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      initializeAllocationWorkbenchState();
+      state.allocationWorkbench[button.dataset.allocationChoice] = button.dataset.allocationValue;
+      renderAllocationSystem();
+    });
+  });
+  root.querySelectorAll("[data-allocation-input]").forEach((input) => {
+    input.addEventListener("change", () => {
+      initializeAllocationWorkbenchState();
+      state.allocationWorkbench[input.dataset.allocationInput] = clampNumber(Number(input.value || 0), 50000, 50000000);
+      renderAllocationSystem();
+    });
+  });
+  root.querySelectorAll("[data-allocation-range]").forEach((input) => {
+    input.addEventListener("input", () => {
+      initializeAllocationWorkbenchState();
+      const key = input.dataset.allocationRange;
+      state.allocationWorkbench[key] =
+        key === "horizon_years"
+          ? clampNumber(Number(input.value || 0), 1, 15)
+          : key === "risk_aversion"
+            ? clampNumber(Number(input.value || 0), 2, 10)
+            : key === "safety_floor_ratio"
+              ? clampNumber(Number(input.value || 0), 10, 70)
+            : clampNumber(Number(input.value || 0), 3, 10);
+      renderAllocationSystem();
+    });
+  });
+  root.querySelectorAll("[data-bl-view-field]").forEach((input) => {
+    const syncViewField = () => {
+      initializeAllocationWorkbenchState();
+      const index = Number(input.dataset.blViewIndex);
+      const field = input.dataset.blViewField;
+      const nextViews = [...(state.allocationWorkbench.bl_views || [])];
+      if (!nextViews[index]) return;
+      nextViews[index] = {
+        ...nextViews[index],
+        [field]: field === "return_delta" || field === "confidence" ? Number(input.value || 0) : input.value,
+      };
+      if (field === "type" && input.value === "absolute") {
+        delete nextViews[index].relative_asset;
+      }
+      if (field === "type" && input.value === "relative" && !nextViews[index].relative_asset) {
+        nextViews[index].relative_asset = nextViews[index].asset;
+      }
+      state.allocationWorkbench.bl_views = nextViews;
+      renderAllocationSystem();
+    };
+    input.addEventListener("change", syncViewField);
+    if (input.tagName === "INPUT") {
+      input.addEventListener("input", syncViewField);
+    }
+  });
+  root.querySelectorAll("[data-bl-view-remove]").forEach((button) => {
+    button.addEventListener("click", () => {
+      initializeAllocationWorkbenchState();
+      const index = Number(button.dataset.blViewRemove);
+      state.allocationWorkbench.bl_views = (state.allocationWorkbench.bl_views || []).filter((_, i) => i !== index);
+      renderAllocationSystem();
+    });
+  });
+  root.querySelectorAll("[data-bl-view-add]").forEach((button) => {
+    button.addEventListener("click", () => {
+      initializeAllocationWorkbenchState();
+      const config = getAllocationWorkbenchConfig();
+      const maxViews = Number(config?.black_litterman_settings?.max_views || 6);
+      const firstAsset = config?.asset_map?.[0]?.name || "";
+      const secondAsset = config?.asset_map?.[1]?.name || firstAsset;
+      const nextViews = [...(state.allocationWorkbench.bl_views || [])];
+      if (nextViews.length >= maxViews) return;
+      nextViews.push({
+        type: "relative",
+        asset: firstAsset,
+        relative_asset: secondAsset,
+        return_delta: 1,
+        confidence: clampNumber(Number(state.allocationWorkbench.view_confidence || 6), 2, 10),
+      });
+      state.allocationWorkbench.bl_views = nextViews;
+      renderAllocationSystem();
+    });
+  });
+}
+
 function flashAssetCard(assetName) {
   if (!assetName) return;
   const target = document.querySelector(`[data-asset-name="${CSS.escape(assetName)}"]`);
@@ -2532,6 +4023,52 @@ function bindPathNodes(scopeSelector) {
   });
 }
 
+function renderMethodSystemCard(value) {
+  if (!value) return "";
+  return `
+    <article class="method-card method-system-card">
+      <div class="method-system-head">
+        <div>
+          <div class="method-system-kicker">Asset Allocation System</div>
+          <h3>${escapeHtml(value.title)}</h3>
+          <p>${escapeHtml(value.summary)}</p>
+        </div>
+      </div>
+      <div class="method-system-grid">
+        ${(value.layers || [])
+          .map(
+            (layer) => `
+              <section class="method-system-step-card">
+                <div class="method-system-step-top">
+                  <span class="method-system-step-no">${escapeHtml(layer.label || "")}</span>
+                  <span class="method-system-step-title">${escapeHtml(layer.title || "")}</span>
+                </div>
+                <div class="method-system-methods">
+                  ${(layer.methods || []).map((method) => `<span class="meta-pill">${escapeHtml(method)}</span>`).join("")}
+                </div>
+                <ul>${(layer.points || []).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+              </section>
+            `
+          )
+          .join("")}
+      </div>
+      ${
+        value.house_playbook
+          ? `
+            <div class="method-system-playbook">
+              <div class="method-system-playbook-head">
+                <h4>${escapeHtml(value.house_playbook.title || "")}</h4>
+                <p>${escapeHtml(value.house_playbook.summary || "")}</p>
+              </div>
+              <ul>${(value.house_playbook.points || []).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+            </div>
+          `
+          : ""
+      }
+    </article>
+  `;
+}
+
 function renderMethods() {
   const methodsIntro = state.data.config.methods_index_intro;
   renderResearchMapIntro("methods-index-intro", methodsIntro);
@@ -2545,11 +4082,33 @@ function renderMethods() {
           <div class="method-meta">
             ${item.tags.map((tag) => `<span class="meta-pill">${escapeHtml(tag)}</span>`).join("")}
           </div>
+          ${item.system_role ? `<div class="method-role">${escapeHtml(item.system_role)}</div>` : ""}
           <p>${escapeHtml(item.summary)}</p>
           <div class="detail-section">
             <h4>在系统中的用途</h4>
             <ul>${item.usage.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
           </div>
+          ${
+            (item.source_links || []).length
+              ? `
+                <div class="detail-section">
+                  <h4>网上原始资料</h4>
+                  <div class="method-source-list">
+                    ${(item.source_links || [])
+                      .map(
+                        (source) => `
+                          <a class="method-source-item" href="${encodePathForHref(source.url)}" target="_blank" rel="noreferrer">
+                            <span class="method-source-title">${escapeHtml(source.label)}</span>
+                            ${source.note ? `<span class="method-source-note">${escapeHtml(source.note)}</span>` : ""}
+                          </a>
+                        `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+              : ""
+          }
           ${
             linkedReports.length
               ? `
@@ -2566,6 +4125,16 @@ function renderMethods() {
     .join("");
 }
 
+function renderAllocationSystem() {
+  initializeAllocationWorkbenchState();
+  renderResearchMapIntro("allocation-system-intro", state.data.config.allocation_system_intro);
+  document.getElementById("allocation-system-grid").innerHTML = [
+    renderMethodSystemCard(state.data.config.methods_system),
+    renderAllocationWorkbench(),
+  ].join("");
+  bindAllocationWorkbenchControls();
+}
+
 function renderAssetIndexIntro() {
   const assetIntro = state.data.config.assets_index_intro;
   renderResearchMapIntro("assets-index-intro", assetIntro);
@@ -2574,6 +4143,7 @@ function renderAssetIndexIntro() {
 async function init() {
   state.data = await getBundle();
   state.activeScenarioId = state.data.current_view?.current_system_path?.linked_scenario_id || state.activeScenarioId;
+  initializeAllocationWorkbenchState();
   initTabs();
   initTopbarOffsetObserver();
   setActiveTab(state.activeTab, { preserveAssetFocus: true });
@@ -2592,6 +4162,7 @@ async function init() {
   renderHistory();
   renderIndicators();
   renderMethods();
+  renderAllocationSystem();
 }
 
 init();

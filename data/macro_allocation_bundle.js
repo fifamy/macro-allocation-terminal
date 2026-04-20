@@ -30,15 +30,48 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
       {
         "id": "methods",
         "label": "配置方法论"
+      },
+      {
+        "id": "allocation-system",
+        "label": "配置系统"
       }
     ],
     "methods": [
       {
+        "title": "均值-方差优化 / 战略资产配置",
+        "tags": [
+          "经典起点",
+          "战略锚"
+        ],
+        "system_role": "系统角色：长期中枢权重",
+        "summary": "Markowitz 均值-方差优化是最经典的战略配置起点：先用预期收益、波动和相关性求出长期权重，再把它当作组合的长期中枢。",
+        "usage": [
+          "适合回答“长期大概该配多少股、债、商品和现金”，不适合直接表达单月或单季观点。",
+          "更适合作为战略锚，再让风险平价、GTAA 或宏观因子风险预算围绕它做偏离。",
+          "实务中应配合约束、情景分析和再平衡规则使用，否则容易因为输入微小变化而输出剧烈变化。",
+          "在当前终端里，可以把它理解成“长期中枢权重”的来源，再用宏观判断决定是否做阶段性倾斜。"
+        ],
+        "source_links": [
+          {
+            "label": "CFA Institute: Overview of Asset Allocation",
+            "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/overview-asset-allocation",
+            "note": "总览 asset-only、liability-relative、goals-based 三类配置口径。"
+          },
+          {
+            "label": "CFA Institute: Principles of Asset Allocation",
+            "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/principles-asset-allocation",
+            "note": "详细讨论 MVO、全球市场组合、风险预算与再平衡。"
+          }
+        ],
+        "external_report_support": []
+      },
+      {
         "title": "风险平价 / 全天候",
         "tags": [
-          "组合构建",
-          "分散风险"
+          "分散风险",
+          "战略锚"
         ],
+        "system_role": "系统角色：稳健底仓",
         "summary": "把组合风险而不是名义资金作为分配对象，适合在宏观不确定性较高时构建稳健底仓。",
         "usage": [
           "适合作为长期战略配置的中性底座。",
@@ -48,6 +81,18 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
           "结合中国版全天候和六周期配置报告后，更稳妥的落地方式通常是“风险平价做底座，周期观点做倾斜”，而不是静态等风险持有。",
           "中国版全天候更适合做“债券底仓 + 股票/商品/黄金分阶段抬升”的动态配置，而不是机械沿用海外固定参数。",
           "不同风险定义会直接改变配置结果，因此风险平价不能只讲概念，还要说明波动率、回撤和尾部风险的差异。"
+        ],
+        "source_links": [
+          {
+            "label": "Bridgewater: The All Weather Strategy",
+            "url": "https://www.bridgewater.com/research-and-insights/the-all-weather-strategy",
+            "note": "全天候框架的官方介绍，强调不同增长/通胀环境下的分散化。"
+          },
+          {
+            "label": "AQR: Risk Parity, Risk Management and the Real World",
+            "url": "https://www.aqr.com/Insights/Research/White-Papers/Risk-Parity-Risk-Management-and-the-Real-World",
+            "note": "强调风险平价的核心是动态风险管理，而不是静态波动率配比。"
+          }
         ],
         "external_report_support": [
           {
@@ -181,19 +226,50 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         ]
       },
       {
+        "title": "全球战术资产配置 GTAA",
+        "tags": [
+          "趋势跟踪",
+          "战术层"
+        ],
+        "system_role": "系统角色：中期战术倾斜",
+        "summary": "GTAA 把跨资产趋势、动量和风险偏好信号转成中期仓位倾斜，更像在战略配置之上的战术覆盖层，而不是长期锚。",
+        "usage": [
+          "适合在股票、债券、商品、REITs、黄金和外汇等大类资产之间做中期轮动。",
+          "更适合作为战略锚之上的 overlay，而不是每次都从零构建全组合。",
+          "当宏观判断还不够强，但价格趋势和跨市场强弱很清楚时，GTAA 很有用。",
+          "在当前终端里，它最适合做“宏观判断之外的价格确认层”，避免只靠叙事做大幅调仓。"
+        ],
+        "source_links": [
+          {
+            "label": "SSRN: A Quantitative Approach to Tactical Asset Allocation",
+            "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461",
+            "note": "Meb Faber 的经典 GTAA 论文，用趋势规则做跨资产战术配置。"
+          }
+        ],
+        "external_report_support": []
+      },
+      {
         "title": "宏观因子风险预算",
         "tags": [
           "股债配置",
           "中国本土化"
         ],
+        "system_role": "系统角色：宏观观点 -> 风险预算",
         "summary": "把股票、利率债、信用债等资产先映射成增长、利率、信用、期限利差、规模风格等宏观因子，再按风险预算分配，是中国机构较实用的股债配置方法。",
         "usage": [
           "适合解释为什么同样是债券配置，利率债和信用债的权重变化并不同步。",
           "适合把“领先指标改善但信用未完全确认”的判断，转成偏债但逐步抬升权益风险预算的方案。",
           "可作为当前判断和组合权重建议之间的桥梁。",
-          "六周期配置框架说明，中长贷脉冲、信用扩张和海外风险溢价变化，都可以进一步转成权益、黄金、债券之间的动态风险预算。",
+          "当宏观观点明确但不想直接押单一行业或单一资产时，用因子预算比直接改资金比例更稳。",
           "六周期配置和 FOF 跟踪结果说明，宏观判断可以先转成因子风险预算，再映射到股、债、黄金之间的动态权重。",
           "如果当前只是左侧宽松而非右侧确认，因子风险预算应先上调债券和黄金，而不是直接把股票提到高位。"
+        ],
+        "source_links": [
+          {
+            "label": "CFA Institute: Principles of Asset Allocation",
+            "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/principles-asset-allocation",
+            "note": "涵盖 risk budgeting、factor-based allocation 与 rebalancing 的经典框架。"
+          }
         ],
         "external_report_support": [
           {
@@ -334,14 +410,22 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
           "主观观点",
           "权重融合"
         ],
+        "system_role": "系统角色：把主观观点变成权重",
         "summary": "把市场隐含均衡收益与研究观点结合起来，把“我看多什么”转化成更稳健的权重输出。",
         "usage": [
           "适合把研究结论从超配/低配进一步转成区间权重。",
           "能降低单一主观观点直接决定组合的波动。",
           "适合作为中后期版本的配置引擎接口。",
-          "结合 ETF 配置报告后，Black-Litterman 最适合作为“宏观状态识别 -> 观点矩阵 -> 可交易 ETF 权重”的最后一跳。",
+          "当你已经有一套宏观观点矩阵，但不想让优化器输出过于极端时，Black-Litterman 很适合做最后一跳。",
           "在 ETF 宏观择时框架里，Black-Litterman 更适合放在最后一跳，用来把场景判断和资产排序转成可交易权重。",
           "真正需要输入的不是一句“看多”，而是观点强度、置信度和约束条件，否则优化器只会放大判断噪音。"
+        ],
+        "source_links": [
+          {
+            "label": "Goldman Sachs: Black-Litterman Model History",
+            "url": "https://www.goldmansachs.com/our-firm/history/moments/1990-black-litterman-model",
+            "note": "Goldman Sachs 对 Black-Litterman 起源和用途的官方回顾。"
+          }
         ],
         "external_report_support": [
           {
@@ -491,16 +575,74 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         ]
       },
       {
+        "title": "目标导向 / 负债约束配置",
+        "tags": [
+          "目标管理",
+          "约束优先"
+        ],
+        "system_role": "系统角色：先定账户目标",
+        "summary": "经典配置不是只分股债比例，还要先判断你是在做 asset-only、liability-relative，还是 goals-based 配置；这决定组合真正服务的目标是什么。",
+        "usage": [
+          "适合养老金、保险、教育金、退休账户以及任何有明确现金流目标的组合。",
+          "先把必须守住的负债、支出或目标拆出来，再决定增长资产应该承担多少风险。",
+          "它回答的是“先配什么账户结构”，而不是“先买什么资产”。",
+          "在当前终端里，这一层最适合放在所有宏观观点之前，先决定组合是以净值增长为主，还是以资金用途和时间点为主。"
+        ],
+        "source_links": [
+          {
+            "label": "CFA Institute: Overview of Asset Allocation",
+            "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/overview-asset-allocation",
+            "note": "明确区分 asset-only、liability-relative、goals-based 三种口径。"
+          },
+          {
+            "label": "CFA Institute: Principles of Asset Allocation",
+            "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/principles-asset-allocation",
+            "note": "展开介绍 liability-relative 与 goals-based 的具体做法。"
+          }
+        ],
+        "external_report_support": []
+      },
+      {
+        "title": "核心-卫星 + 阈值再平衡",
+        "tags": [
+          "执行层",
+          "仓位纪律"
+        ],
+        "system_role": "系统角色：组合落地与维护",
+        "summary": "核心层负责长期可持有的宽基、债券和现金，卫星层负责表达行业、主题和宏观观点；再用阈值和时间规则控制偏离。",
+        "usage": [
+          "适合把经典方法的输出真正落到 ETF、基金或大类资产组合，而不是只停留在理论权重。",
+          "核心层更适合放长期锚，卫星层才用来表达宏观或行业观点。",
+          "适合与 range-based rebalancing 配合，避免每次观点变化都重建整套组合。",
+          "在当前终端里，它最适合作为默认执行层，把风险平价、GTAA、Black-Litterman 或情景映射的结果统一落地。"
+        ],
+        "source_links": [
+          {
+            "label": "Morningstar: How to Build a Core and Satellite Portfolio",
+            "url": "https://global.morningstar.com/en-gb/personal-finance/how-to-build-a-core-and-satellite-portfolio",
+            "note": "清楚解释了 core 持仓与 satellite 表达的角色分工。"
+          },
+          {
+            "label": "CFA Institute: Principles of Asset Allocation",
+            "url": "https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/principles-asset-allocation",
+            "note": "涵盖 calendar-based 与 range-based rebalancing 的经典处理方式。"
+          }
+        ],
+        "external_report_support": []
+      },
+      {
         "title": "情景映射 + 区间权重",
         "tags": [
-          "第一版主口径",
+          "终端默认",
           "易沟通"
         ],
+        "system_role": "系统角色：第一版默认输出层",
         "summary": "第一版终端先不用优化器，直接用情景判断输出超配、中性、低配，再映射到权重区间。",
         "usage": [
           "最适合内部讨论与投委会前置沟通。",
           "便于快速调整而不需要重建模型。",
-          "为后续半自动或模型化升级预留空间。",
+          "特别适合宏观观点还在变化、但团队需要先形成仓位上限和下限的阶段。",
+          "它不是经典学术模型，但很适合作为经典方法之上的“解释层”和“汇报层”。",
           "最稳妥的落地方式不是一次性给点位权重，而是先按左侧、过渡期、右侧确认划分区间，再随着信用和盈利验证逐步移动中枢。",
           "如果情景判断主要来自价格先行信号，区间权重应更保守；如果领先指标、信用和盈利三者共振，才适合向上沿靠拢。"
         ],
@@ -636,6 +778,425 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
         ]
       }
     ],
+    "methods_system": {
+      "title": "经典方法拼装成的资产配置系统",
+      "summary": "资产配置系统不应只押一种模型，而是把目标层、战略层、战术层、观点融合层和执行层串起来。当前终端更适合把经典方法拆成模块组合，而不是直接套单一优化器。",
+      "layers": [
+        {
+          "label": "Layer 1",
+          "title": "先定目标与约束口径",
+          "methods": [
+            "目标导向 / 负债约束配置",
+            "均值-方差优化 / 战略资产配置"
+          ],
+          "points": [
+            "先回答组合到底是追求净值最大化，还是为负债、退休、教育等目标服务。",
+            "先把时间期限、流动性、回撤容忍度和再平衡纪律写清楚，再谈模型。"
+          ]
+        },
+        {
+          "label": "Layer 2",
+          "title": "再选长期战略锚",
+          "methods": [
+            "均值-方差优化 / 战略资产配置",
+            "风险平价 / 全天候"
+          ],
+          "points": [
+            "想要长期市场中枢，可用 MVO / 全球市场组合思路定大类资产中枢。",
+            "想要更稳的底仓和更均衡的风险暴露，可用风险平价 / 全天候做战略锚。"
+          ]
+        },
+        {
+          "label": "Layer 3",
+          "title": "用战术层做中期倾斜",
+          "methods": [
+            "全球战术资产配置 GTAA",
+            "宏观因子风险预算"
+          ],
+          "points": [
+            "GTAA 更适合看价格趋势和跨资产强弱，宏观因子风险预算更适合表达研究观点和中国本土总量信号。",
+            "战术层的任务不是推翻战略锚，而是在可控风险预算内做偏离。"
+          ]
+        },
+        {
+          "label": "Layer 4",
+          "title": "把观点转成可执行权重",
+          "methods": [
+            "Black-Litterman",
+            "情景映射 + 区间权重"
+          ],
+          "points": [
+            "观点需要更精细落到权重时，用 Black-Litterman 融合先验和主观判断。",
+            "只需要快速形成投委会语言时，用情景映射 + 区间权重更易沟通。"
+          ]
+        },
+        {
+          "label": "Layer 5",
+          "title": "统一落到执行与再平衡",
+          "methods": [
+            "核心-卫星 + 阈值再平衡"
+          ],
+          "points": [
+            "核心层承接长期中枢，卫星层承接宏观、行业和主题观点。",
+            "统一用季度检查 + 阈值触发控制偏离，避免每次观点变化都重建全组合。"
+          ]
+        }
+      ],
+      "house_playbook": {
+        "title": "当前终端默认落地法",
+        "summary": "适合这个宏观终端的默认路径，不直接套单一优化器，而是把经典方法按层组合。",
+        "points": [
+          "先用目标导向 / asset-only 口径决定组合究竟服务什么目标，再写清流动性、期限和风险边界。",
+          "长期中枢优先从均值-方差或风险平价里选一个：判断不强时偏风险平价，长期配置研究更充分时偏战略中枢。",
+          "中期倾斜优先用宏观因子风险预算或 GTAA：宏观观点更强时用因子预算，价格趋势更强时用 GTAA。",
+          "如果需要更精细的权重输出，再往上叠 Black-Litterman；如果只是先形成团队口径，就保持情景映射 + 区间权重。",
+          "最终统一落到核心-卫星 + 阈值再平衡，让模型输出能真正转成可执行组合。"
+        ]
+      }
+    },
+    "allocation_workbench": {
+      "title": "资产配置系统沙盘",
+      "summary": "基于当前 bundle 里的大类资产建议、数据驱动优先级和宏观判断，允许手工调整关键参数，实时输出一套新的资产配置结果。",
+      "defaults": {
+        "capital": 300000,
+        "allocation_model": "regime_budget",
+        "risk_profile": "balanced",
+        "horizon_years": 5,
+        "macro_stance": "neutral",
+        "home_bias": "domestic",
+        "rebalance_threshold": 5,
+        "risk_aversion": 6,
+        "tactical_strength": 6,
+        "factor_tilt_strength": 6,
+        "view_confidence": 6,
+        "safety_floor_ratio": 35,
+        "bl_views": [
+          {
+            "type": "relative",
+            "asset": "中国股票",
+            "relative_asset": "海外股票",
+            "return_delta": 2.0,
+            "confidence": 7
+          },
+          {
+            "type": "relative",
+            "asset": "中国信用债",
+            "relative_asset": "中国利率债",
+            "return_delta": 0.8,
+            "confidence": 6
+          }
+        ]
+      },
+      "allocation_models": [
+        {
+          "value": "regime_budget",
+          "label": "系统预算",
+          "note": "按当前宏观判断、风险档位和资产分层直接分配权重。"
+        },
+        {
+          "value": "risk_parity",
+          "label": "风险平价 / 全天候",
+          "note": "按风险预算分配三大风险资产层，再在层内按当前判断做拆分。"
+        },
+        {
+          "value": "gtaa",
+          "label": "全球战术资产配置 GTAA",
+          "note": "围绕战略锚做跨资产战术倾斜，更强调趋势和相对强弱。"
+        },
+        {
+          "value": "macro_factor_budget",
+          "label": "宏观因子风险预算",
+          "note": "先做因子预算，再把增长、利率、信用和通胀预算映射回资产。"
+        },
+        {
+          "value": "black_litterman",
+          "label": "Black-Litterman",
+          "note": "把战略锚和当前主观观点融合成后验权重。"
+        },
+        {
+          "value": "goals_based",
+          "label": "目标导向 / 负债约束",
+          "note": "先划出安全桶，再把剩余资金配置到增长桶。"
+        },
+        {
+          "value": "core_satellite",
+          "label": "核心-卫星 + 阈值再平衡",
+          "note": "核心仓承接长期中枢，卫星仓承接当前宏观观点，并按阈值纪律控制偏离。"
+        },
+        {
+          "value": "scenario_band",
+          "label": "情景映射 + 区间权重",
+          "note": "把超配、中性、低配直接翻译成参考区间内的目标权重，更适合投委会口径。"
+        },
+        {
+          "value": "mean_variance",
+          "label": "均值-方差",
+          "note": "在参考区间约束下，用预期收益、波动和相关性做简化优化。"
+        }
+      ],
+      "risk_profiles": [
+        {
+          "value": "conservative",
+          "label": "保守",
+          "note": "更强调回撤控制和底仓稳定。",
+          "sleeves": {
+            "equity": 22,
+            "bonds": 48,
+            "alternatives": 14,
+            "cash": 16
+          }
+        },
+        {
+          "value": "balanced",
+          "label": "稳健",
+          "note": "股债并重，保留一定进攻仓位。",
+          "sleeves": {
+            "equity": 36,
+            "bonds": 40,
+            "alternatives": 14,
+            "cash": 10
+          }
+        },
+        {
+          "value": "growth",
+          "label": "积极",
+          "note": "更高权益预算，接受更大波动。",
+          "sleeves": {
+            "equity": 52,
+            "bonds": 26,
+            "alternatives": 14,
+            "cash": 8
+          }
+        }
+      ],
+      "macro_stances": [
+        {
+          "value": "defensive",
+          "label": "防守执行",
+          "note": "在当前宏观判断下更强调债券和现金。",
+          "adjustments": {
+            "equity": -6,
+            "bonds": 4,
+            "alternatives": 0,
+            "cash": 2
+          }
+        },
+        {
+          "value": "neutral",
+          "label": "基准执行",
+          "note": "按当前数据和系统建议中性落地。",
+          "adjustments": {
+            "equity": 0,
+            "bonds": 0,
+            "alternatives": 0,
+            "cash": 0
+          }
+        },
+        {
+          "value": "offensive",
+          "label": "进取执行",
+          "note": "放大当前修复判断，提高风险预算。",
+          "adjustments": {
+            "equity": 6,
+            "bonds": -4,
+            "alternatives": 1,
+            "cash": -3
+          }
+        }
+      ],
+      "home_biases": [
+        {
+          "value": "domestic",
+          "label": "中国偏配",
+          "note": "更强调当前国内宏观主线。",
+          "score_overrides": {
+            "中国股票": 1.18,
+            "海外股票": 0.88,
+            "海外债券": 0.92,
+            "美元/外汇": 0.92
+          }
+        },
+        {
+          "value": "balanced",
+          "label": "均衡分散",
+          "note": "境内外大致平衡，不额外加偏。",
+          "score_overrides": {}
+        },
+        {
+          "value": "hedged",
+          "label": "海外对冲",
+          "note": "提高海外债券和外汇对冲的权重。",
+          "score_overrides": {
+            "中国股票": 0.94,
+            "海外股票": 1.06,
+            "海外债券": 1.2,
+            "美元/外汇": 1.25,
+            "中国商品/黄金": 1.08
+          }
+        }
+      ],
+      "asset_map": [
+        {
+          "name": "中国股票",
+          "sleeve": "equity"
+        },
+        {
+          "name": "海外股票",
+          "sleeve": "equity"
+        },
+        {
+          "name": "中国利率债",
+          "sleeve": "bonds"
+        },
+        {
+          "name": "中国信用债",
+          "sleeve": "bonds"
+        },
+        {
+          "name": "海外债券",
+          "sleeve": "bonds"
+        },
+        {
+          "name": "中国商品/黄金",
+          "sleeve": "alternatives"
+        },
+        {
+          "name": "美元/外汇",
+          "sleeve": "alternatives"
+        },
+        {
+          "name": "REITs/另类",
+          "sleeve": "alternatives"
+        },
+        {
+          "name": "中国货币/现金",
+          "sleeve": "cash"
+        }
+      ],
+      "asset_assumptions": {
+        "中国股票": {
+          "expected_return": 8.8,
+          "volatility": 22
+        },
+        "中国利率债": {
+          "expected_return": 3.1,
+          "volatility": 5.2
+        },
+        "中国信用债": {
+          "expected_return": 4.4,
+          "volatility": 7.5
+        },
+        "中国商品/黄金": {
+          "expected_return": 5.7,
+          "volatility": 17.5
+        },
+        "中国货币/现金": {
+          "expected_return": 1.8,
+          "volatility": 1
+        },
+        "海外股票": {
+          "expected_return": 7.4,
+          "volatility": 18.5
+        },
+        "海外债券": {
+          "expected_return": 3.5,
+          "volatility": 8.2
+        },
+        "美元/外汇": {
+          "expected_return": 2.6,
+          "volatility": 7.2
+        },
+        "REITs/另类": {
+          "expected_return": 5.9,
+          "volatility": 13.8
+        }
+      },
+      "asset_factor_exposures": {
+        "中国股票": {
+          "growth": 0.95,
+          "rate": -0.2,
+          "credit": 0.55,
+          "inflation": 0.15,
+          "safety": 0.05
+        },
+        "中国利率债": {
+          "growth": -0.1,
+          "rate": 1.0,
+          "credit": 0.1,
+          "inflation": -0.35,
+          "safety": 0.6
+        },
+        "中国信用债": {
+          "growth": 0.25,
+          "rate": 0.5,
+          "credit": 1.0,
+          "inflation": -0.1,
+          "safety": 0.25
+        },
+        "中国商品/黄金": {
+          "growth": 0.3,
+          "rate": -0.15,
+          "credit": 0.05,
+          "inflation": 1.0,
+          "safety": 0.35
+        },
+        "中国货币/现金": {
+          "growth": 0,
+          "rate": 0.15,
+          "credit": 0,
+          "inflation": 0,
+          "safety": 1.0
+        },
+        "海外股票": {
+          "growth": 0.85,
+          "rate": -0.1,
+          "credit": 0.35,
+          "inflation": 0.1,
+          "safety": 0.1
+        },
+        "海外债券": {
+          "growth": -0.05,
+          "rate": 0.85,
+          "credit": 0.15,
+          "inflation": -0.2,
+          "safety": 0.55
+        },
+        "美元/外汇": {
+          "growth": -0.05,
+          "rate": 0.2,
+          "credit": 0,
+          "inflation": 0.1,
+          "safety": 0.8
+        },
+        "REITs/另类": {
+          "growth": 0.45,
+          "rate": 0.05,
+          "credit": 0.2,
+          "inflation": 0.55,
+          "safety": 0.1
+        }
+      },
+      "mean_variance_settings": {
+        "risk_free_rate": 1.8,
+        "anchor_strength": 4.2
+      },
+      "black_litterman_settings": {
+        "tau": 0.08,
+        "max_views": 6
+      },
+      "risk_parity_settings": {
+        "cash_floor": 6,
+        "max_sleeve_weight": 60
+      },
+      "sleeve_labels": {
+        "equity": "权益类",
+        "bonds": "固定收益类",
+        "alternatives": "另类与对冲",
+        "cash": "现金管理"
+      },
+      "minimum_ticket": 5000,
+      "round_lot": 100
+    },
     "assets_index_intro": {
       "title": "资产映射研究导航",
       "summary": "资产映射库不只是解释单个资产，更是把“当前判断”翻译成可执行资产语言的中间层。建议按“先判断位置、再选择方法、最后映射资产”的顺序来使用。",
@@ -671,33 +1232,60 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
     },
     "methods_index_intro": {
       "title": "配置方法研究导航",
-      "summary": "配置方法论页不只是介绍模型，而是回答“宏观判断如何一步步转成仓位”。建议按“先判断位置、再选择方法、最后映射资产”的顺序使用。",
+      "summary": "配置方法论页现在不只展示几个模型，而是把经典配置方法组织成一个可执行系统。建议按“先定目标、再选战略锚、最后叠加战术与执行层”的顺序来使用。",
       "steps": [
         {
-          "step": "先判断位置",
-          "title": "用三元框架确定当前处于左侧、过渡期还是右侧确认",
+          "step": "先定目标",
+          "title": "先决定是 asset-only、目标导向还是负债约束配置",
           "points": [
-            "它决定当前更像左侧、过渡期还是右侧确认阶段。",
-            "如果只是货币先宽，方法论上更偏底仓和风险预算微调；如果信用与实体开始确认，才更适合扩大权益与信用风险预算。",
-            "这套框架最适合决定“先配什么、后配什么”。"
+            "这一层决定组合到底是为净值增长服务，还是为退休、教育、负债和现金流目标服务。",
+            "目标层先于所有宏观观点，因为它决定你能承受什么样的波动和错配。"
           ]
         },
         {
-          "step": "再选择方法",
-          "title": "用四维框架决定该保守落地还是放大判断",
+          "step": "再选战略锚",
+          "title": "用均值-方差或风险平价给出长期中枢",
           "points": [
-            "它决定当前配置建议是否需要被政策面、海外环境和资本流动再次校验。",
-            "如果价格先行但资本流动与海外环境不配合，方法论上就应更保守；如果四维共振，组合可以更积极。",
-            "这套框架最适合决定“要不要放大当前判断”。"
+            "想要长期市场中枢，用均值-方差 / 战略配置；想要更均衡的风险暴露，用风险平价 / 全天候。",
+            "这一层回答的是“长期大体该怎么配”，不是“本月该追什么”。"
           ]
         },
         {
-          "step": "最后映射资产",
-          "title": "在不同方法间选择合适的权重落地方式",
+          "step": "最后做战术和执行",
+          "title": "用 GTAA、宏观因子、Black-Litterman 和核心-卫星把观点落地",
           "points": [
-            "判断不强时，用风险平价、宏观因子风险预算等方法控制波动和节奏。",
-            "判断较强时，再用情景映射区间权重或 Black-Litterman 把观点转成仓位。",
-            "方法论页的作用，是把研究结论从“观点”推进到“组合表达”。"
+            "GTAA 和宏观因子风险预算负责中期倾斜，Black-Litterman 和情景映射负责把观点转成仓位。",
+            "最后统一用核心-卫星 + 阈值再平衡落到组合层，形成真正可执行的资产配置系统。"
+          ]
+        }
+      ]
+    },
+    "allocation_system_intro": {
+      "title": "资产配置系统导航",
+      "summary": "这里不再讲模型定义，而是直接把经典方法和当前宏观判断拼成一个可调参数的配置系统。建议按“先选模型、再调约束、最后看组合结果”的顺序使用。",
+      "steps": [
+        {
+          "step": "先选模型",
+          "title": "在系统预算和均值-方差之间切换",
+          "points": [
+            "系统预算更贴近当前宏观判断和风险分层，是规则型配置引擎。",
+            "均值-方差更适合在参考区间内平衡收益和波动，是简化优化器口径。"
+          ]
+        },
+        {
+          "step": "再调参数",
+          "title": "手动调整规模、期限、风险偏好和境内外偏好",
+          "points": [
+            "这些参数会改变权益、固收、另类和现金四大层的预算，也会改变具体资产的相对得分。",
+            "均值-方差模式下还可以额外调整风险厌恶系数，控制组合更偏收益还是更偏稳健。"
+          ]
+        },
+        {
+          "step": "最后出组合",
+          "title": "直接输出权重、金额、再平衡规则和风险提示",
+          "points": [
+            "底层输入来自当前 bundle 中的大类资产建议、权重区间和数据驱动排序。",
+            "输出结果是一个可执行组合，而不是停留在方法说明里的抽象模型。"
           ]
         }
       ]
@@ -10048,7 +10636,7 @@ window.__MACRO_ALLOCATION_BUNDLE__ = {
     }
   },
   "macro_dashboard": {
-    "generated_at": "2026-04-17 16:03:41",
+    "generated_at": "2026-04-20 08:59:22",
     "generator": {
       "script": "scripts/build_macro_dashboard_data.py",
       "catalog_file": "macro_indicator_list.xlsx",
